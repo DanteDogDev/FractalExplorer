@@ -9,6 +9,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
+import javafx.scene.paint.Color;
+
 public class FractalListener implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener{
 
     FractalFrame frame;
@@ -19,6 +21,8 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
 
     private int mouseX;
     private int mouseY;
+
+    private Point mousePoint;
 
     private Point onDrag;
 
@@ -36,12 +40,16 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        mouseX = e.getX();
-        mouseY = e.getY();
+        double zoom = frame.getZoomLevel();
+        mouseX = (int)((e.getX() / zoom)-frame.getXOffset());
+        mouseY = (int)((e.getY() / zoom)-frame.getYOffset());
+        mousePoint = new Point(mouseX, mouseY);
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        frame.drawDot(mousePoint);
+
     }
 
     @Override
