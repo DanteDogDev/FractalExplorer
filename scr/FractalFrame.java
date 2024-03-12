@@ -19,6 +19,7 @@ import java.awt.image.BufferedImage;
 public class FractalFrame extends JFrame {
 
     private FractalListener fractalListener;
+    private FractalMath fractalMath;
     private BufferedImage canvas;
     private int canvasWidth;
     private int canvasHeight;
@@ -59,6 +60,9 @@ public class FractalFrame extends JFrame {
         // Enable double buffering
         createBufferStrategy(2);
         bufferStrategy = getBufferStrategy();
+
+        //calculating fractals
+        fractalMath = new FractalMath(canvas, 100, canvasWidth, canvasHeight);
     }
     
 
@@ -171,23 +175,11 @@ public class FractalFrame extends JFrame {
 
     }
 
+    /**
+     * 
+     */
     public void calculateFractal() {
-        // Loop through each row of pixels
-        for (int y = 0; y < canvasHeight; y++) {
-            // Loop through each column of pixels
-            for (int x = 0; x < canvasWidth; x++) {
-                // Get the color of the pixel at position (x, y)
-                int pixelColor = canvas.getRGB(x, y);
-                // Manipulate the color or perform any operation here
-                
-                // Example: Invert the color of the pixel
-                int invertedColor = Color.black.getRGB();
-                
-                // Set the new color of the pixel
-                canvas.setRGB(x, y, invertedColor);
-            }
-        }
-        // Repaint the canvas to reflect the changes
+        fractalMath.calculateFractal();
         repaint();
     }
     
