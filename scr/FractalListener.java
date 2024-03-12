@@ -9,8 +9,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
-import javafx.scene.paint.Color;
-
 public class FractalListener implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener{
 
     FractalFrame frame;
@@ -38,6 +36,9 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
         onDrag = current;
     }
 
+    /* 
+     * updates the mouses position every time its moved 
+     */
     @Override
     public void mouseMoved(MouseEvent e) {
         double zoom = frame.getZoomLevel();
@@ -70,6 +71,9 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
         onDrag = null;
     }
 
+    /*
+     * Closes program when pressing esc
+     */
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
@@ -87,7 +91,11 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
     @Override
     public void keyTyped(KeyEvent e) {
     }
-
+    
+    
+    /*
+     * updates zoom level based on scroll wheel movement
+     */
     @Override
     public void mouseWheelMoved(MouseWheelEvent arg0) {
         int notches = arg0.getWheelRotation();

@@ -5,15 +5,16 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+
+//misc
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
 
 //Windows frame library
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
+import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 
 public class FractalFrame extends JFrame {
 
@@ -60,6 +61,10 @@ public class FractalFrame extends JFrame {
     }
     
 
+    /**
+     * Sets up the buffered image
+     * to be as large as your screen
+     */
     public void setupCanvas() {
         //gets size of screen
         imageWidth = (int) (canvasWidth);
@@ -76,11 +81,15 @@ public class FractalFrame extends JFrame {
         repaint();
     }
 
+    /**
+     * Sets up the frame to be
+     * Fullscreen, not resizeable, 
+     * and without the top bar's
+     */
     private void setupFrame() {
         setSize(canvasWidth, canvasHeight);
         setUndecorated(true);
         setResizable(false);
-
         setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
@@ -103,6 +112,7 @@ public class FractalFrame extends JFrame {
      * updates the offset based on the change in x and change in y
      * @param dx change in x
      * @param dy change in y
+     * @see FractalListener#mouseDragged(java.awt.event.MouseEvent)
      */
     public void updateOffset(int dx, int dy) {
         xOffset += dx/zoomLevel;
@@ -111,22 +121,39 @@ public class FractalFrame extends JFrame {
 
     }
 
+    /**
+     * @return XOffset
+     */
     public int getXOffset() {
         return xOffset;
     }
+    /**
+     * @return YOffset
+     */
     public int getYOffset() {
         return yOffset;
     }
     
+    /**
+     * @return Zoom Level
+     */
     public double getZoomLevel() {
         return zoomLevel;
     }
 
+    /**
+     * Sets the zoom level and then updates the canvas
+     * @param zoom
+     * @see FractalListener#mouseWheelMoved(java.awt.event.MouseWheelEvent)
+     */
     public void setZoomLevel(double zoom) {
         zoomLevel = zoom;
         repaint(); // Recreate the canvas with the new zoom level
     }
 
+    /** temp
+     * @param p
+     */
     public void drawDot(Point p){
         int x = p.x;
         int y = p.y;
