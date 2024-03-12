@@ -22,8 +22,6 @@ public class FractalFrame extends JFrame {
     private BufferedImage canvas;
     private int canvasWidth;
     private int canvasHeight;
-    private int imageWidth;
-    private int imageHeight;
     private int xOffset = 0;
     private int yOffset = 0;
     private double zoomLevel = 1.0;
@@ -67,15 +65,13 @@ public class FractalFrame extends JFrame {
      */
     public void setupCanvas() {
         //gets size of screen
-        imageWidth = (int) (canvasWidth);
-        imageHeight = (int) (canvasHeight);
 
         //sets up the canvas
-        canvas = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
+        canvas = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_ARGB);
         
         Graphics2D g2d = canvas.createGraphics();
         g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, imageWidth, imageHeight);
+        g2d.fillRect(0, 0, canvasWidth, canvasHeight);
         g2d.dispose();
 
         repaint();
@@ -99,13 +95,13 @@ public class FractalFrame extends JFrame {
         try {
             super.paint(g2D);
             g2D.scale(zoomLevel, zoomLevel);
-            g2D.drawImage(canvas, xOffset, yOffset, null);
+            g2D.drawImage(canvas, xOffset, yOffset, this);
         } finally {
             g2D.dispose();
         }
         bufferStrategy.show(); // Show the drawn buffer
     }
-
+    
    
     /**
      * 
@@ -147,7 +143,14 @@ public class FractalFrame extends JFrame {
      * @see FractalListener#mouseWheelMoved(java.awt.event.MouseWheelEvent)
      */
     public void setZoomLevel(double zoom) {
+        if(zoom == zoomLevel) {
+            return;
+        }
+        Point mousePos = fractalListener.getMousePointToCanvas();
         zoomLevel = zoom;
+        Point postMousePos = fractalListener.getMousePointToCanvas();
+        xOffset += postMousePos.x - mousePos.x;
+        yOffset += postMousePos.y - mousePos.y;
         repaint(); // Recreate the canvas with the new zoom level
     }
 
@@ -164,12 +167,14 @@ public class FractalFrame extends JFrame {
         repaint();
 
     }
-
+    
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new FractalFrame());
+        SwingUtilities.invokeLater(() -> {
+            FractalFrame frame = new FractalFrame();
+        });
     }
 
-
+    
 
     
 }
