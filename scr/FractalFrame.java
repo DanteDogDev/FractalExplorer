@@ -22,13 +22,16 @@ public class FractalFrame extends JFrame {
     private BufferedImage canvas;
     private int canvasWidth;
     private int canvasHeight;
-    private int xOffset = 0;
-    private int yOffset = 0;
-    private double zoomLevel = 1.0;
+    private int xOffset;
+    private int yOffset;
+    private double zoomLevel;
     private BufferStrategy bufferStrategy;
 
     public FractalFrame() {
         super("Fractal Explorer");
+        xOffset = 0;
+        yOffset = 0;
+        zoomLevel = 1.0;
         //sets icon of the window
         Image icon = new javax.swing.ImageIcon("assets/icon.png").getImage();
         setIconImage(icon);
@@ -167,10 +170,32 @@ public class FractalFrame extends JFrame {
         repaint();
 
     }
+
+    public void calculateFractal() {
+        // Loop through each row of pixels
+        for (int y = 0; y < canvasHeight; y++) {
+            // Loop through each column of pixels
+            for (int x = 0; x < canvasWidth; x++) {
+                // Get the color of the pixel at position (x, y)
+                int pixelColor = canvas.getRGB(x, y);
+                // Manipulate the color or perform any operation here
+                
+                // Example: Invert the color of the pixel
+                int invertedColor = Color.black.getRGB();
+                
+                // Set the new color of the pixel
+                canvas.setRGB(x, y, invertedColor);
+            }
+        }
+        // Repaint the canvas to reflect the changes
+        repaint();
+    }
+    
     
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             FractalFrame frame = new FractalFrame();
+            frame.calculateFractal();
         });
     }
 
