@@ -34,25 +34,6 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
         onDrag = current;
     }
 
-    public Point getMousePoint() {
-        return mousePoint;
-    }
-    public int getMouseX() {
-        return mouseX;
-    }
-    public int getMouseY() {
-        return mouseY;
-    }
-    public Point getMousePointToCanvas() {
-        return new Point(getMouseXToCanvas(), getMouseYToCanvas());
-    }
-    public int getMouseXToCanvas() {
-        return  (int)((mouseX / frame.getZoomLevel())-frame.getXOffset());
-    }
-    public int getMouseYToCanvas() {
-        return (int)((mouseY / frame.getZoomLevel())-frame.getYOffset());
-    }
-
     /* 
      * updates the mouses position every time its moved 
      */
@@ -65,7 +46,6 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        frame.drawDot(mousePoint);
         System.out.println("Mouse Clicked - ("+mouseX+", "+mouseY+")");
     }
 
@@ -93,9 +73,8 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            // Close the program
-            frame.dispose(); // Close the window
-            System.exit(0); // Exit the application
+            frame.dispose();
+            System.exit(0);
         }
 
     }
@@ -116,9 +95,9 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
     public void mouseWheelMoved(MouseWheelEvent arg0) {
         int notches = arg0.getWheelRotation();
         if(notches < 0){
-            frame.setZoomLevel(frame.getZoomLevel()+0.1);
+            frame.updateZoomLevel(0.9);
         } else {
-            frame.setZoomLevel(Math.max(0.1, frame.getZoomLevel()-0.1));
+            frame.updateZoomLevel(1.1);
         }
     }
     
