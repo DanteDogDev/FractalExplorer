@@ -12,15 +12,15 @@ import java.awt.event.MouseWheelListener;
 public class FractalListener implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener{
 
     FractalFrame frame;
+    private int mouseX;
+    private int mouseY;
+    private Point onDrag;
+    public boolean loadingZoom;
 
     public FractalListener(FractalFrame frame) {
         this.frame = frame;
+        loadingZoom = false;
     }
-
-    private int mouseX;
-    private int mouseY;
-    private Point mousePoint;
-    private Point onDrag;
 
     @Override
     public void mouseDragged(MouseEvent e) {
@@ -41,7 +41,6 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
     public void mouseMoved(MouseEvent e) {
         mouseX = e.getX();
         mouseY = e.getY();
-        mousePoint = new Point(mouseX, mouseY);
     }
 
     @Override
@@ -93,10 +92,15 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
      */
     @Override
     public void mouseWheelMoved(MouseWheelEvent arg0) {
+        if(loadingZoom == true) {
+            return;
+        }
         int notches = arg0.getWheelRotation();
         if(notches < 0){
+            loadingZoom = true;
             frame.updateZoomLevel(0.9);
         } else {
+            loadingZoom = true;
             frame.updateZoomLevel(1.1);
         }
     }

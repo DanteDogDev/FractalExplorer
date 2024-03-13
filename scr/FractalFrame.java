@@ -17,9 +17,9 @@ import java.awt.image.BufferedImage;
 
 public class FractalFrame extends JFrame {
 
-    private FractalListener fractalListener;
-    private FractalMath fractalMath;
-    private BufferedImage canvas;
+    public FractalListener fractalListener;
+    public FractalMath fractalMath;
+    public BufferedImage canvas;
     private int canvasWidth;
     private int canvasHeight;
     private BufferStrategy bufferStrategy;
@@ -50,12 +50,12 @@ public class FractalFrame extends JFrame {
         // Make the frame visible
         setVisible(true);
     
-        // Enable double buffering
+        // Enable double bufferinga
         createBufferStrategy(2);
         bufferStrategy = getBufferStrategy();
 
         // calculating fractals
-        fractalMath = new FractalMath(canvas, 100, canvasWidth, canvasHeight);
+        fractalMath = new FractalMath(this, 100, canvasWidth, canvasHeight);
         calculateFractal();
     }
     
@@ -126,10 +126,11 @@ public class FractalFrame extends JFrame {
     }
 
     /**
-     * 
+     * calculates the data for the canvas then paints the canvas
      */
     public void calculateFractal() {
-        fractalMath.calculateFractal();
+        fractalMath.multiThreadCalculateFractal(5);
+        //fractalMath.calculateFractal();
         repaint();
     }
     
