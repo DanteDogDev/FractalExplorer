@@ -129,10 +129,12 @@ public class FractalFrame extends JFrame {
      * calculates the data for the canvas then paints the canvas
      */
     public void calculateFractal() {
-        fractalMath.multiThreadCalculateFractal(5);
-        //fractalMath.calculateFractal();
+        fractalMath.multiThreadCalculateFractal(6);
+        //fractalMath.borderTraceCalculation(1);
         repaint();
     }
+
+
     
     
     public static void main(String[] args) {

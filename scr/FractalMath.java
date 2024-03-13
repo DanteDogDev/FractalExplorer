@@ -1,18 +1,28 @@
 package scr;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class FractalMath {
     public int maxIter;
     public int width;
     public int height;
 
-    private FractalFrame frame;
+    public FractalFrame frame;
     public float centerReal = -0.5f;
     public float centerImag = 0;
     public float zoom = 1.0f;
 
+
+    /**
+     * @param frame frame of the canvas
+     * @param maxIter maxium amount of iterations for each calculation of the fractal
+     * @param width width of the canvas
+     * @param height height of the canvas
+     */
     public FractalMath(FractalFrame frame, int maxIter, int width, int height) {
         this.frame = frame;
         this.maxIter = maxIter;
@@ -20,27 +30,41 @@ public class FractalMath {
         this.height = height;
     }
 
-    public void setColor(int real, int imag, int iterations) {
-        if (iterations == maxIter) {
-            frame.canvas.setRGB(real, imag, Color.BLACK.getRGB());
+
+    /**
+     * colors a pixel on the buffered image canvas depending on the 
+     * number of iteration it took for the calculation to complete
+     * @param real
+     * @param imag
+     * @param iterations
+     */
+    public void setColor(int x, int y, int iterations) {
+        if(iterations == 0){
+            frame.canvas.setRGB(x, y, Color.WHITE.getRGB());
+            return;
+        }
+        if (iterations == maxIter || iterations == -1 ) {
+            frame.canvas.setRGB(x, y, Color.BLACK.getRGB());
+            return;
         } else {
             float hue = (float) iterations / maxIter;
-            frame.canvas.setRGB(real, imag, Color.getHSBColor(hue, 1, 1).getRGB());
+            frame.canvas.setRGB(x, y, Color.getHSBColor(hue, 1, 1).getRGB());
+            return;
         }
     }
 
-    public void setColor(int real, int imag, Color color) {
-        
-        frame.canvas.setRGB(real, imag, color.getRGB());
-        
-    }
-
+    /**
+     * calcualtes the mandelbrot set for the cordinates given
+     * @param real
+     * @param imag
+     * @return
+     */
     public int mandelbrotSet(float real, float imag) {
         int i = 0;
         float zReal = 0;
         float zImag = 0;
 
-        for (i = 0; i < maxIter; i++) {
+        for (i = 1; i < maxIter; i++) {
             float zRealTemp = zReal * zReal - zImag * zImag + real;
             zImag = 2 * zReal * zImag + imag;
             zReal = zRealTemp;
@@ -53,6 +77,68 @@ public class FractalMath {
         return i;
     }
 
+    /**
+     * calculates the fractal by flood filling the border around 
+     * the canvas until it reaches the black parts of the set and skips then in order to 
+     * not have to compute them
+     * @param threads
+     * @see FractalBorderTrace#run()
+     */
+    public void borderTraceCalculation() {
+        double startTime = System.nanoTime();
+        int[][] data = new int[width][height];
+        Queue<Point> queue = new LinkedList<Point>();
+
+        for (int x = 0; x < width; x++) {
+            queue.add(new Point(x, 0));
+            data[x][0] = -2;
+            queue.add(new Point(x, height - 1));
+            data[x][height - 1] = -2;
+        }
+
+        for (int y = 1; y < height - 1; y++) {
+            queue.add(new Point(0, y));
+            data[0][y] = -2;
+            queue.add(new Point(width - 1, y));
+            data[width - 1][y] = -2;
+        }
+
+        // Start threads for border tracing
+        ArrayList<FractalBorderTrace> threadList = new ArrayList<FractalBorderTrace>();
+        for (int i = 0; i < 1; i++) {
+            FractalBorderTrace thread = new FractalBorderTrace(this, queue, data);
+            thread.start();
+            threadList.add(thread);
+        }
+    
+        // Wait for all threads to finish
+        for (FractalBorderTrace thread : threadList) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    
+        // Set colors on the canvas using the computed Mandelbrot set data
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                setColor(x, y, data[x][y]);
+            }
+        }
+    
+        // Update loading status
+        frame.fractalListener.loadingZoom = false;
+        System.out.println((System.nanoTime() - startTime));
+    }
+    
+
+    /**
+     * assigs threads to a array to calculate the iterations it takes to solve the 
+     * fractal faster than it would take to just loop through every pixel
+     * @param threads
+     * @see FractalThreading#run()
+     */
     public void multiThreadCalculateFractal(int threads) {
         double startTime = System.nanoTime();
         ArrayList<FractalThreading> threadList = new ArrayList<FractalThreading>();
@@ -77,25 +163,13 @@ public class FractalMath {
 
     }
 
-    public void calculateFractal() {
-        double startTime = System.nanoTime();
-        float minReal = centerReal - 2.5f / zoom;
-        float maxReal = centerReal + 2.5f / zoom;
-        float minImag = centerImag - 2.0f / zoom;
-        float maxImag = centerImag + 2.0f / zoom;
-
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                float real = minReal + x * (maxReal - minReal) / width;
-                float imag = minImag + y * (maxImag - minImag) / height;
-
-                int iter = mandelbrotSet(real, imag);
-                setColor(x, y, iter);
-            }
-        }
-        System.out.println((System.nanoTime()-startTime));
-    }
-
+    /**
+     * updates the offset to act as if your 
+     * dragging the fractal around your screen
+     * @param dx change in x
+     * @param dy change in y
+     * @see FractalFrame#updateOffset(int, int)
+     */
     public void updateOffset(int dx, int dy) {
         float realIncrement = (2.5f / zoom) / width;
         float imagIncrement = (2.0f / zoom) / height;
@@ -105,6 +179,11 @@ public class FractalMath {
     }
 
 
+    /**
+     * updates how far to zoom into the fractal
+     * @param zoomFactor
+     * @see FractalFrame#updateZoomLevel(double)
+     */
     public void updateZoomLevel(double zoomFactor) {
         zoom *= zoomFactor;
     }
