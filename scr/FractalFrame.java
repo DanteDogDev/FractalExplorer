@@ -1,3 +1,9 @@
+/**
+ * Name:Dante Harper
+ * Date:2024 / 3 / 13
+ * Desc: generates a frame with a buffered image that 
+ * has a fractal where you could freely explore
+ */
 package scr;
 //Graphics Library
 import java.awt.Color;
@@ -24,7 +30,7 @@ public class FractalFrame extends JFrame {
     private int canvasHeight;
     private BufferStrategy bufferStrategy;
 
-    public double scale = 10;
+    public double scale = 1.5;
 
     public FractalFrame(int maxIterations) {
         super("Fractal Explorer");
@@ -106,7 +112,6 @@ public class FractalFrame extends JFrame {
     
    
     /**
-     * 
      * updates the offset based on the change in x and change in y
      * @param dx change in x
      * @param dy change in y
@@ -150,8 +155,6 @@ public class FractalFrame extends JFrame {
     }
 
     public void resetFractal(){
-        fractalMath.seedReal = 0;
-        fractalMath.seedImag = 0;
         fractalMath.resetFractal();
         calculateFractal();
     }
@@ -171,7 +174,7 @@ public class FractalFrame extends JFrame {
     
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            FractalFrame frame = new FractalFrame(10000);
+            FractalFrame frame = new FractalFrame(255);
         });
     }
 

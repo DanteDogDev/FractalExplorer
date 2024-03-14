@@ -1,3 +1,8 @@
+/**
+ * Name:Dante Harper
+ * Date:2024 / 3 / 13
+ * Desc: calculates the math required to render a fractal on the screen
+ */
 package scr;
 
 import java.awt.Color;
@@ -6,26 +11,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FractalMath {
+    public FractalFrame frame;
+    private FractalEdgeTrace tracer;
     public int maxIter;
     public int width;
     public int height;
 
-    public FractalFrame frame;
-    public float centerReal = -0.5f;
-    public float centerImag = 0;
-    public float zoom = 1.0f;
     
+    //data used by the program
     private int[][] data;
-    private FractalEdgeTrace tracer;
     private List<Color> colors;
 
-    private float minReal;
-    private float maxReal;
-    private float minImag;
-    private float maxImag;
+    // where on the fractal to view
+    public double centerReal = -0.5f;
+    public double centerImag = 0;
+    public double zoom = 1.0f;
 
-    public float seedReal;
-    public float seedImag;
+    private double minReal;
+    private double maxReal;
+    private double minImag;
+    private double maxImag;
+
+    // seed for the julia set fractal
+    public double seedReal;
+    public double seedImag;
 
     /*
      * Filter 0: Normal
@@ -61,8 +70,12 @@ public class FractalMath {
 
     /**
      * Resets the fractal to default position
+     * @see FractalFrame#resetFractal()
+     * @see FractalListener#keyPressed(java.awt.event.KeyEvent)
      */
     public void resetFractal(){
+        seedReal = 0;
+        seedImag = 0;
         centerReal = -0.5f;
         centerImag = 0;
         zoom = 1.0f;
@@ -76,25 +89,34 @@ public class FractalMath {
     /**
      * colors a pixel on the buffered image canvas depending on the 
      * number of iteration it took for the calculation to complete
-     * @param real
-     * @param imag
-     * @param iterations
+     * @param cords on the canvas
+     * @param iterations number of iteration it took to solve fractal
+     * @see this{@link #generateColorPattern(int)}
+     * @see this{@link #data}
      */
     public void setColor(int x, int y, int iterations) {
         int color = 0;
         if (iterations == maxIter ) {
-            color = Color.BLACK.getRGB();
+            color = Color.BLACK.getRGB(); // color pixel black
         } else if (iterations == 0){
-            color = Color.WHITE.getRGB();
+            color = Color.WHITE.getRGB(); // color pixel white
         }else {
-            float hue = (float) (iterations-1) / maxIter;
-            color = colors.get(iterations%colors.size()).getRGB();
+            double hue = (double) (iterations-1) / maxIter;
+            color = colors.get(iterations%colors.size()).getRGB(); // color pixel based on a gradient
         }
         if(frame.canvas.getRGB(x, y) != color){
             frame.canvas.setRGB(x, y, color);
         }
     }
 
+    /**
+     * loops through the data and sets all the pixels 
+     * in the canvas as pixels arcording to the data
+     * and if the filter is set to it apply a edge filter
+     * @see this{@link #setColor(int, int, int)
+     * @see FractalFrame#canvas
+     * @see this{@link #data}
+     */
     public void colorData(){
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -112,20 +134,19 @@ public class FractalMath {
     }
 
     /**
-     * Generates a list of colors based on the HSB color list
      * @param numColors number of colors in the list more colors the smoother gradient
-     * @return
+     * @return a list of colors based on the HSB color list
      */
     public static List<Color> generateColorPattern(int numColors) {
         List<Color> colors = new ArrayList<>();
 
         for (int i = 0; i < numColors; i++) {
-            float hue = (float) i / numColors; 
-            float saturation = 1; 
-            float brightness = 1;
+            double hue = (double) i / numColors; 
+            double saturation = 1; 
+            double brightness = 1;
             
             // create a color using the HSB set
-            Color color = Color.getHSBColor(hue, saturation, brightness);
+            Color color = Color.getHSBColor((float)hue, (float)saturation, (float)brightness);
             //add the color
             colors.add(color);
         }
@@ -133,7 +154,12 @@ public class FractalMath {
         return colors;
     }
 
-
+    /**
+     * chooses which fractal to use to draw the fractal
+     * @param cords to start the path
+     * @see this{@link #mandelbrotSet(int, int)}
+     * @see this{@link #juliaSet(int, int)}
+     */
     public int drawFractal(int x, int y){
         if(seedImag == 0 || seedReal == 0){
             return mandelbrotSet(x, y);
@@ -142,6 +168,13 @@ public class FractalMath {
         }
     }
 
+    
+    /**
+     * chooses which fractal to use to draw the path
+     * @param cords to start the path
+     * @see this{@link #drawMandelBrotSetPath(int, int)}
+     * @see this{@link #drawJuliaSetPath(int, int)}
+     */
     public void drawFractalPath(int x, int y){
         if(seedImag == 0 || seedReal == 0){
             drawMandelBrotSetPath(x, y);
@@ -158,17 +191,19 @@ public class FractalMath {
      * @return the number of iterations it takes to complete calculation
      */
     public int mandelbrotSet(int x, int y) {
-        float real = minReal + x * (maxReal - minReal) / width;
-        float imag = minImag + y * (maxImag - minImag) / height;
+        double real = minReal + x * (maxReal - minReal) / width;
+        double imag = minImag + y * (maxImag - minImag) / height;
         int i = 0;
-        float zReal = 0;
-        float zImag = 0;
+        double zReal = 0;
+        double zImag = 0;
 
         for (i = 0; i < maxIter; i++) {
-            float zRealTemp = zReal * zReal - zImag * zImag + real;
+            //iterate through the fractal
+            double zRealTemp = zReal * zReal - zImag * zImag + real;
             zImag = 2 * zReal * zImag + imag;
             zReal = zRealTemp;
 
+            //if it gets too big its solved
             if ((zReal * zReal) + (zImag * zImag) > 4) {
                 break;
             }
@@ -183,17 +218,19 @@ public class FractalMath {
     * @return The number of iterations it takes to complete the calculation
     */
     public int juliaSet(int x, int y) {
-        float real = minReal + x * (maxReal - minReal) / width;
-        float imag = minImag + y * (maxImag - minImag) / height;
+        double real = minReal + x * (maxReal - minReal) / width;
+        double imag = minImag + y * (maxImag - minImag) / height;
         int i = 0;
-        float zReal = real;
-        float zImag = imag;
+        double zReal = real;
+        double zImag = imag;
 
         for (i = 0; i < maxIter; i++) {
-            float zRealTemp = zReal * zReal - zImag * zImag + seedReal;
+            //iterate through the fractal
+            double zRealTemp = zReal * zReal - zImag * zImag + seedReal;
             zImag = 2 * zReal * zImag + seedImag;
             zReal = zRealTemp;
 
+            //if it gets too big its solved
             if ((zReal * zReal) + (zImag * zImag) > 4) {
                 break;
             }
@@ -208,20 +245,23 @@ public class FractalMath {
      * @param cordinate on the canvas
      */
     public void drawMandelBrotSetPath(int x, int y) {
-        float real = minReal + x * (maxReal - minReal) / width;
-        float imag = minImag + y * (maxImag - minImag) / height;
-        float zReal = 0;
-        float zImag = 0;
+        double real = minReal + x * (maxReal - minReal) / width;
+        double imag = minImag + y * (maxImag - minImag) / height;
+        double zReal = 0;
+        double zImag = 0;
         Point prev = null;
         Point current = null;
         for (int i = 0; i < 100; i++) {
-            float zRealTemp = zReal * zReal - zImag * zImag + real;
+            //iterate through the fractal
+            double zRealTemp = zReal * zReal - zImag * zImag + real;
             zImag = 2 * zReal * zImag + imag;
             zReal = zRealTemp;
 
             current = imagToPixel(zReal, zImag);
             frame.drawLine(current, prev);
             prev = current;
+
+            //if it gets too big its solved
             if ((zReal * zReal) + (zImag * zImag) > 4) {
                 break;
             }
@@ -233,30 +273,34 @@ public class FractalMath {
      * @param cordinate on the canvas
      */
     public void drawJuliaSetPath(int x, int y) {
-        float real = minReal + x * (maxReal - minReal) / width;
-        float imag = minImag + y * (maxImag - minImag) / height;
-        float zReal = real;
-        float zImag = imag;
+        double real = minReal + x * (maxReal - minReal) / width;
+        double imag = minImag + y * (maxImag - minImag) / height;
+        double zReal = real;
+        double zImag = imag;
         Point prev = null;
         Point current = null;
         for (int i = 0; i < 100; i++) {
-            float zRealTemp = zReal * zReal - zImag * zImag + seedReal;
+            //iterate through the fractal
+            double zRealTemp = zReal * zReal - zImag * zImag + seedReal;
             zImag = 2 * zReal * zImag + seedImag;
             zReal = zRealTemp;
 
             current = imagToPixel(zReal, zImag);
             frame.drawLine(current, prev);
             prev = current;
+
+            //if it gets too big its solved
             if ((zReal * zReal) + (zImag * zImag) > 4) {
                 break;
             }
         }
     }
+
     /**
      * @param point on the fractal
      * @return point on the canvas
      */
-     public Point imagToPixel(float real, float imag) {
+     public Point imagToPixel(double real, double imag) {
         int x = (int) ((real - minReal) / (maxReal - minReal) * width);
         int y = (int) ((imag - minImag) / (maxImag - minImag) * height);
         return new Point(x, y);
@@ -266,8 +310,8 @@ public class FractalMath {
      * @param point on the fractal
      * @return point on the canvas
      */
-     public float xToReal(int x) {
-        float real = minReal + x * (maxReal - minReal) / width;
+     public double xToReal(int x) {
+        double real = minReal + x * (maxReal - minReal) / width;
         return real;
     }
 
@@ -275,13 +319,17 @@ public class FractalMath {
      * @param point on the fractal
      * @return point on the canvas
      */
-    public float yToImag(int y) {
-        float imag = minImag + y * (maxImag - minImag) / height;
+    public double yToImag(int y) {
+        double imag = minImag + y * (maxImag - minImag) / height;
         return imag;
     }
     
     
 
+    /**
+     * Calculates the fractal distributing the load between 16 threads
+     * @see FractalEdgeTrace#calculateEdgeFractal(int)
+     */
     public void edgeDetectionFractal() {
         tracer.calculateEdgeFractal(16);
     }
@@ -294,12 +342,13 @@ public class FractalMath {
      * @see FractalFrame#updateOffset(int, int)
      */
     public void updateOffset(int dx, int dy) {
-        float realIncrement = (2.5f / zoom) / width;
-        float imagIncrement = (2.0f / zoom) / height;
+        double realIncrement = (2.5f / zoom) / width;
+        double imagIncrement = (2.0f / zoom) / height;
 
         centerReal -= dx * realIncrement;
         centerImag -= dy * imagIncrement;
 
+        //recalculates the position of the fractal
         minReal = centerReal - 2.5f / zoom;
         maxReal = centerReal + 2.5f / zoom;
         minImag = centerImag - 2.0f / zoom;
@@ -315,6 +364,7 @@ public class FractalMath {
     public void updateZoomLevel(double zoomFactor) {
         zoom *= zoomFactor;
 
+        //recalculates the position of the fractal
         minReal = centerReal - 2.5f / zoom;
         maxReal = centerReal + 2.5f / zoom;
         minImag = centerImag - 2.0f / zoom;

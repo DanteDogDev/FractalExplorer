@@ -1,3 +1,11 @@
+/**
+ * Name:Dante Harper
+ * Date:2024 / 3 / 13
+ * Desc: calculates the fractal by tracing 
+ * the edges of the fractal and skipping a lot of the calculations
+ * since when u find the edge of a fractal you just need to fill 
+ * everything thats within that edge with whatever color represents it 
+ */
 package scr;
 
 import java.util.concurrent.ExecutorService;
@@ -14,14 +22,21 @@ public class FractalEdgeTrace {
         this.data = data;
     }
 
+    /**
+     * generates 64 rectangles around the screen 
+     * in order to maximize its ability to locate the edges
+     * @param numThreads number of threads to distribute load
+     * @see this{@link #renderRectangle(int, int, int, int)}
+     */
     public void calculateEdgeFractal(int numThreads){
-        int sectorWidth = (math.width/8);
-        int sectorHeight = (math.height/8);
+        int sectorNum = 8;
+        int sectorWidth = (math.width/sectorNum);
+        int sectorHeight = (math.height/sectorNum);
         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
-        for (int i = 0; i < 64; i++) {
-            final int startX = i / 8 * sectorWidth;
-            final int startY = i % 8 * sectorHeight;
+        for (int i = 0; i < sectorNum*sectorNum; i++) {
+            final int startX = i / sectorNum * sectorWidth;
+            final int startY = i % sectorNum * sectorHeight;
             //assigns workload to the threads
             executor.execute(() -> renderRectangle(startX, startY, sectorWidth, sectorHeight));
         }
@@ -40,6 +55,23 @@ public class FractalEdgeTrace {
 
     }
     
+    /**
+     * uses recursion to search a rectangle for the edge of a fractal when
+     * a rectangle detects that there is at least part of an edge of the 
+     * fractal inside it it splits up the quadrant untill the line is fully
+     * rendered and reducing the amount of unnessesary calculations
+     * @param startX starting x
+     * @param startY starting y
+     * @param sectorWidth how big the sector width is
+     * @param sectorHeight how big the sector height is
+     * @see this{@link #fullRenderRectangle(int, int, int, int)}
+     *    used to fill the rectangle bececause it coulnt go into 
+     *    smaller increments to find the exact line
+     * @see this{@link #fullRenderRectangle(int, int, int, int, int)} 
+     *    used to fill in a rectangle that is 
+     *    guaranteed to be one color because all 
+     *    the edges of the rectangle had been a single color
+     */
     public void renderRectangle(int startX, int startY, int sectorWidth, int sectorHeight){
         boolean lineDetected = false;
         int control = math.drawFractal(startX, startY);
@@ -102,15 +134,31 @@ public class FractalEdgeTrace {
         
     }
  
+    /**
+     * renders the rest of the rectangle 
+     * using the mandelbrot calcuation
+     * @param startX
+     * @param startY
+     * @param sectorWidth
+     * @param sectorHeight
+     */
     public void fullRenderRectangle(int startX, int startY, int sectorWidth, int sectorHeight){
         for(int x = startX+1; x < startX + sectorWidth-1; x++){
             for(int y = startY+1; y < startY + sectorHeight-1; y++){ // Fixed loop condition
-                //float real = minReal + x * (maxReal - minReal) / math.width;
-                //float imag = minImag + y * (maxImag - minImag) / math.height;
                 data[x][y] = math.drawFractal(x, y);
             }
         }
     }
+
+    /** renders the rest of the rectangle 
+     *  by filling up the space with control
+     *  as to not cause unnessesary calcuations  
+     * @param startX
+     * @param startY
+     * @param sectorWidth
+     * @param sectorHeight
+     * @param control
+     */
     public void fullRenderRectangle(int startX, int startY, int sectorWidth, int sectorHeight, int control){
         for(int x = startX+1; x < startX + sectorWidth-1; x++){
             for(int y = startY+1; y < startY + sectorHeight-1; y++){ // Fixed loop condition
@@ -119,6 +167,12 @@ public class FractalEdgeTrace {
         }
     }
     
+    /**
+     * detects if a pixel in the data has an edge or not
+     * @param cords in the data
+     * @return returns the intensity of the edge
+     * @see FractalMath#colorData()
+     */
     public int computeEdgeStrength(int x, int y) {
         int[][] gx = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
         int[][] gy = {{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}};
@@ -142,17 +196,5 @@ public class FractalEdgeTrace {
         return (int) Math.sqrt(sumX * sumX + sumY * sumY);
     }
     
-    public void applyEdgeDetection() {
-        for (int y = 0; y < math.height; y++) {
-            for (int x = 0; x < math.width; x++) {
-                int edgeStrength = computeEdgeStrength(x, y);
-
-                int edge = edgeStrength != 0 ? 255 : 0;
-
-                math.setColor(x, y, edge);
-            }
-        }
-    }
-
 
 }
