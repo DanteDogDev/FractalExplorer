@@ -2,6 +2,8 @@ package scr;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FractalMath {
     public int maxIter;
@@ -15,6 +17,7 @@ public class FractalMath {
     
     private int[][] data;
     private FractalEdgeTrace tracer;
+    private List<Color> colors;
 
     private float minReal;
     private float maxReal;
@@ -45,6 +48,7 @@ public class FractalMath {
         this.height = height;
         this.data = new int[width][height];
         this.tracer = new FractalEdgeTrace(this, data);
+        colors = generateColorPattern(100);
 
         minReal = centerReal - 2.5f / zoom;
         maxReal = centerReal + 2.5f / zoom;
@@ -53,6 +57,20 @@ public class FractalMath {
 
         seedReal = 0;
         seedImag = 0;
+    }
+
+    /**
+     * Resets the fractal to default position
+     */
+    public void resetFractal(){
+        centerReal = -0.5f;
+        centerImag = 0;
+        zoom = 1.0f;
+        minReal = centerReal - 2.5f / zoom;
+        maxReal = centerReal + 2.5f / zoom;
+        minImag = centerImag - 2.0f / zoom;
+        maxImag = centerImag + 2.0f / zoom;
+        filter = 0;
     }
 
     /**
@@ -70,7 +88,7 @@ public class FractalMath {
             color = Color.WHITE.getRGB();
         }else {
             float hue = (float) (iterations-1) / maxIter;
-            color = Color.getHSBColor(hue, 1, 1).getRGB();
+            color = colors.get(iterations%colors.size()).getRGB();
         }
         if(frame.canvas.getRGB(x, y) != color){
             frame.canvas.setRGB(x, y, color);
@@ -92,6 +110,29 @@ public class FractalMath {
         }
         frame.fractalListener.loadingZoom = false;
     }
+
+    /**
+     * Generates a list of colors based on the HSB color list
+     * @param numColors number of colors in the list more colors the smoother gradient
+     * @return
+     */
+    public static List<Color> generateColorPattern(int numColors) {
+        List<Color> colors = new ArrayList<>();
+
+        for (int i = 0; i < numColors; i++) {
+            float hue = (float) i / numColors; 
+            float saturation = 1; 
+            float brightness = 1;
+            
+            // create a color using the HSB set
+            Color color = Color.getHSBColor(hue, saturation, brightness);
+            //add the color
+            colors.add(color);
+        }
+
+        return colors;
+    }
+
 
     public int drawFractal(int x, int y){
         if(seedImag == 0 || seedReal == 0){

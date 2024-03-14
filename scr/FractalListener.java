@@ -34,7 +34,7 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
         frame.updateOffset(dx, dy);
         onDrag = current;
     } else if (SwingUtilities.isRightMouseButton(e)) {
-        frame.setFractalSeed(e.getX(),e.getY());
+        frame.setFractalSeed((int)(e.getX()/frame.scale),(int)(e.getY()/frame.scale));
     }
 
     }
@@ -44,7 +44,7 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
      */
     @Override
     public void mouseMoved(MouseEvent e) {
-        frame.calculateFractalPath(e.getX(),e.getY());
+        frame.calculateFractalPath((int)(e.getX()/frame.scale),(int)(e.getY()/frame.scale));
     }
 
     @Override
@@ -64,7 +64,7 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
     public void mousePressed(MouseEvent e) {
         onDrag = e.getPoint();
         if (SwingUtilities.isRightMouseButton(e)) {
-            frame.setFractalSeed(e.getX(),e.getY());
+            frame.setFractalSeed((int)(e.getX()/frame.scale),(int)(e.getY()/frame.scale));
         }
     }
 

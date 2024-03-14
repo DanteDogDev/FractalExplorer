@@ -24,7 +24,9 @@ public class FractalFrame extends JFrame {
     private int canvasHeight;
     private BufferStrategy bufferStrategy;
 
-    public FractalFrame() {
+    public double scale = 10;
+
+    public FractalFrame(int maxIterations) {
         super("Fractal Explorer");
         // sets icon of the window
         Image icon = new javax.swing.ImageIcon("assets/icon.png").getImage();
@@ -43,8 +45,8 @@ public class FractalFrame extends JFrame {
         setupFrame();
     
         // sets up the canvas
-        canvasWidth = screenSize.width;
-        canvasHeight = screenSize.height;
+        canvasWidth = (int)(screenSize.width/scale);
+        canvasHeight = (int)(screenSize.height/scale);
         setupCanvas();
     
         // Make the frame visible
@@ -55,7 +57,7 @@ public class FractalFrame extends JFrame {
         bufferStrategy = getBufferStrategy();
 
         // calculating fractals
-        fractalMath = new FractalMath(this, 100, canvasWidth, canvasHeight);
+        fractalMath = new FractalMath(this, maxIterations, canvasWidth, canvasHeight);
         calculateFractal();
     }
     
@@ -93,6 +95,7 @@ public class FractalFrame extends JFrame {
     public void paint(Graphics g) {
         Graphics2D g2D = (Graphics2D) bufferStrategy.getDrawGraphics();
         try {
+            g2D.scale(scale, scale);
             super.paint(g2D);
             g2D.drawImage(canvas, 0, 0, this);
         } finally {
@@ -149,6 +152,7 @@ public class FractalFrame extends JFrame {
     public void resetFractal(){
         fractalMath.seedReal = 0;
         fractalMath.seedImag = 0;
+        fractalMath.resetFractal();
         calculateFractal();
     }
 
@@ -167,7 +171,7 @@ public class FractalFrame extends JFrame {
     
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            FractalFrame frame = new FractalFrame();
+            FractalFrame frame = new FractalFrame(10000);
         });
     }
 
