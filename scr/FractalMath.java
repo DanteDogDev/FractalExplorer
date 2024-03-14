@@ -15,6 +15,7 @@ public class FractalMath {
     public float centerReal = -0.5f;
     public float centerImag = 0;
     public float zoom = 1.0f;
+    
 
 
     /**
@@ -47,11 +48,12 @@ public class FractalMath {
             frame.canvas.setRGB(x, y, Color.BLACK.getRGB());
             return;
         } else {
-            float hue = (float) iterations / maxIter;
+            float hue = (float) (iterations-1) / maxIter;
             frame.canvas.setRGB(x, y, Color.getHSBColor(hue, 1, 1).getRGB());
             return;
         }
     }
+
 
     /**
      * calcualtes the mandelbrot set for the cordinates given
@@ -142,9 +144,9 @@ public class FractalMath {
     public void multiThreadCalculateFractal(int threads) {
         double startTime = System.nanoTime();
         ArrayList<FractalThreading> threadList = new ArrayList<FractalThreading>();
-        int[][] arr = new int[width][height];
+        int[][] data = new int[width][height];
         for (int i = 0; i < threads; i++) {
-            FractalThreading thread = new FractalThreading(this, i, threads, arr);
+            FractalThreading thread = new FractalThreading(this, i, threads, data);
             thread.start();
             threadList.add(thread);
         }
@@ -157,10 +159,32 @@ public class FractalMath {
                 e.printStackTrace();
             }
         }
+        //new FractalEdgeTrace(this,width,height,data).applyEdgeDetection();
         
         frame.fractalListener.loadingZoom = false;
         System.out.println((System.nanoTime()-startTime));
 
+    }
+
+    public void edgeDetectionFractal() {
+        double startTime = System.nanoTime();
+        ArrayList<FractalThreading> threadList = new ArrayList<FractalThreading>();
+        int[][] data = new int[width][height];
+
+        FractalEdgeTrace tracer = new FractalEdgeTrace(this, data);
+        tracer.calculateEdgeFractal();
+
+        //color it
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                
+                setColor(x, y, data[x][y]);
+                
+            }
+        }
+
+        frame.fractalListener.loadingZoom = false;
+        System.out.println((System.nanoTime()-startTime));
     }
 
     /**
@@ -186,5 +210,6 @@ public class FractalMath {
      */
     public void updateZoomLevel(double zoomFactor) {
         zoom *= zoomFactor;
+        
     }
 }

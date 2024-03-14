@@ -55,7 +55,7 @@ public class FractalFrame extends JFrame {
         bufferStrategy = getBufferStrategy();
 
         // calculating fractals
-        fractalMath = new FractalMath(this, 100, canvasWidth, canvasHeight);
+        fractalMath = new FractalMath(this, 50, canvasWidth, canvasHeight);
         calculateFractal();
     }
     
@@ -129,8 +129,9 @@ public class FractalFrame extends JFrame {
      * calculates the data for the canvas then paints the canvas
      */
     public void calculateFractal() {
-        fractalMath.multiThreadCalculateFractal(6);
-        //fractalMath.borderTraceCalculation(1);
+        //fractalMath.multiThreadCalculateFractal(6);
+        //fractalMath.borderTraceCalculation();
+        fractalMath.edgeDetectionFractal();
         repaint();
     }
 
