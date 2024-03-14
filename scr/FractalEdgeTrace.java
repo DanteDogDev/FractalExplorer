@@ -87,7 +87,7 @@ public class FractalEdgeTrace {
                 fullRenderRectangle(startX,startY,sectorWidth,sectorHeight);
             }
         } else {
-            //fullRenderRectangle(startX,startY,sectorWidth,sectorHeight,control);
+            fullRenderRectangle(startX,startY,sectorWidth,sectorHeight,control);
         }
         
     }

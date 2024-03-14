@@ -40,17 +40,15 @@ public class FractalMath {
      * @param iterations
      */
     public void setColor(int x, int y, int iterations) {
-        if(iterations == 0){
-            frame.canvas.setRGB(x, y, Color.WHITE.getRGB());
-            return;
-        }
-        if (iterations == maxIter || iterations == -1 ) {
-            frame.canvas.setRGB(x, y, Color.BLACK.getRGB());
-            return;
+        int color = 0;
+        if (iterations == maxIter ) {
+            color = Color.BLACK.getRGB();
         } else {
             float hue = (float) (iterations-1) / maxIter;
-            frame.canvas.setRGB(x, y, Color.getHSBColor(hue, 1, 1).getRGB());
-            return;
+            color = Color.getHSBColor(hue, 1, 1).getRGB();
+        }
+        if(frame.canvas.getRGB(x, y) != color){
+            frame.canvas.setRGB(x, y, color);
         }
     }
 
@@ -66,7 +64,7 @@ public class FractalMath {
         float zReal = 0;
         float zImag = 0;
 
-        for (i = 1; i < maxIter; i++) {
+        for (i = 0; i < maxIter; i++) {
             float zRealTemp = zReal * zReal - zImag * zImag + real;
             zImag = 2 * zReal * zImag + imag;
             zReal = zRealTemp;
