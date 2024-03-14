@@ -17,7 +17,6 @@ import java.awt.Toolkit;
 
 //Windows frame library
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 
@@ -30,7 +29,7 @@ public class FractalFrame extends JFrame {
     private int canvasHeight;
     private BufferStrategy bufferStrategy;
 
-    public double scale = 1.5;
+    public double scale = 1;
 
     public FractalFrame(int maxIterations) {
         super("Fractal Explorer");
@@ -64,7 +63,6 @@ public class FractalFrame extends JFrame {
 
         // calculating fractals
         fractalMath = new FractalMath(this, maxIterations, canvasWidth, canvasHeight);
-        calculateFractal();
     }
     
 
@@ -173,9 +171,8 @@ public class FractalFrame extends JFrame {
     
     
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            FractalFrame frame = new FractalFrame(255);
-        });
+        FractalFrame frame = new FractalFrame(80);
+        frame.calculateFractal();
     }
 
     

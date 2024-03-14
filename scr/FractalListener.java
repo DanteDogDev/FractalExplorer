@@ -44,7 +44,9 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
      */
     @Override
     public void mouseMoved(MouseEvent e) {
-        frame.calculateFractalPath((int)(e.getX()/frame.scale),(int)(e.getY()/frame.scale));
+        if(!loadingZoom) {
+            frame.calculateFractalPath((int)(e.getX()/frame.scale),(int)(e.getY()/frame.scale));
+        }
     }
 
     @Override

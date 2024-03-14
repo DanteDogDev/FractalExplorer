@@ -101,7 +101,6 @@ public class FractalMath {
         } else if (iterations == 0){
             color = Color.WHITE.getRGB(); // color pixel white
         }else {
-            double hue = (double) (iterations-1) / maxIter;
             color = colors.get(iterations%colors.size()).getRGB(); // color pixel based on a gradient
         }
         if(frame.canvas.getRGB(x, y) != color){
@@ -197,7 +196,7 @@ public class FractalMath {
         double zReal = 0;
         double zImag = 0;
 
-        for (i = 0; i < maxIter; i++) {
+        for (i = 1; i < maxIter; i++) {
             //iterate through the fractal
             double zRealTemp = zReal * zReal - zImag * zImag + real;
             zImag = 2 * zReal * zImag + imag;
@@ -224,7 +223,7 @@ public class FractalMath {
         double zReal = real;
         double zImag = imag;
 
-        for (i = 0; i < maxIter; i++) {
+        for (i = 1; i < maxIter; i++) {
             //iterate through the fractal
             double zRealTemp = zReal * zReal - zImag * zImag + seedReal;
             zImag = 2 * zReal * zImag + seedImag;

@@ -8,9 +8,9 @@
  */
 package scr;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+//import java.util.concurrent.ExecutorService;
+//import java.util.concurrent.Executors;
+//import java.util.concurrent.TimeUnit;
 
 public class FractalEdgeTrace {
 
@@ -29,27 +29,28 @@ public class FractalEdgeTrace {
      * @see this{@link #renderRectangle(int, int, int, int)}
      */
     public void calculateEdgeFractal(int numThreads){
-        int sectorNum = 8;
+        int sectorNum = 1;
         int sectorWidth = (math.width/sectorNum);
         int sectorHeight = (math.height/sectorNum);
-        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+        //ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
         for (int i = 0; i < sectorNum*sectorNum; i++) {
             final int startX = i / sectorNum * sectorWidth;
             final int startY = i % sectorNum * sectorHeight;
             //assigns workload to the threads
-            executor.execute(() -> renderRectangle(startX, startY, sectorWidth, sectorHeight));
+            //executor.execute(() -> renderRectangle(startX, startY, sectorWidth, sectorHeight))s;
+            renderRectangle(startX, startY, sectorWidth, sectorHeight);
         }
 
 
-        //waits for all the threads to be finnished
-        executor.shutdown();
-        try {
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException e) {
-            // will force the working thread to close
-            Thread.currentThread().interrupt();
-        }
+        ////waits for all the threads to be finnished
+        //executor.shutdown();
+        //try {
+        //    executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        //} catch (InterruptedException e) {
+        //    // will force the working thread to close
+        //    Thread.currentThread().interrupt();
+        //}
 
 
 
@@ -110,6 +111,11 @@ public class FractalEdgeTrace {
                 lineDetected = true;
             }
         }
+        
+        // Uncomment to see the fractal generate in real time (Dont try to zoom or drag the fractal)
+        //math.colorData();
+        //math.frame.repaint();
+
         //if line is detected in quadrant split up the quadrant and look for the line
         //else
         //render all the pixels acording to the control 
