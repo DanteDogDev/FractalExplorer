@@ -5,7 +5,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-
+import java.awt.Point;
 //misc
 import java.awt.Toolkit;
 
@@ -55,7 +55,7 @@ public class FractalFrame extends JFrame {
         bufferStrategy = getBufferStrategy();
 
         // calculating fractals
-        fractalMath = new FractalMath(this, 50, canvasWidth, canvasHeight);
+        fractalMath = new FractalMath(this, 100, canvasWidth, canvasHeight);
         calculateFractal();
     }
     
@@ -129,10 +129,37 @@ public class FractalFrame extends JFrame {
      * calculates the data for the canvas then paints the canvas
      */
     public void calculateFractal() {
-        //fractalMath.multiThreadCalculateFractal(6);
-        //fractalMath.borderTraceCalculation();
         fractalMath.edgeDetectionFractal();
+        fractalMath.colorData();
         repaint();
+    }
+
+    public void calculateFractalPath(int x, int y){
+        fractalMath.colorData();
+        fractalMath.drawFractalPath(x,y);
+        repaint();
+    }
+
+    public void setFractalSeed(int x, int y){
+        fractalMath.seedReal = fractalMath.xToReal(x);
+        fractalMath.seedImag = fractalMath.yToImag(y);
+        calculateFractal();
+    }
+
+    public void resetFractal(){
+        fractalMath.seedReal = 0;
+        fractalMath.seedImag = 0;
+        calculateFractal();
+    }
+
+    public void drawLine(Point p1, Point p2) {
+        if(p2 == null || p1 == null){
+            return;
+        }
+        Graphics g = canvas.getGraphics();
+        g.setColor(Color.RED); // You can change the color if needed
+        g.drawLine(p1.x, p1.y, p2.x, p2.y); 
+        g.dispose(); // Dispose the Graphics object to free resources
     }
 
 

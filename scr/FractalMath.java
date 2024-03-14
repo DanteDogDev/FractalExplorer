@@ -2,9 +2,6 @@ package scr;
 
 import java.awt.Color;
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 
 public class FractalMath {
     public int maxIter;
@@ -16,6 +13,23 @@ public class FractalMath {
     public float centerImag = 0;
     public float zoom = 1.0f;
     
+    private int[][] data;
+    private FractalEdgeTrace tracer;
+
+    private float minReal;
+    private float maxReal;
+    private float minImag;
+    private float maxImag;
+
+    public float seedReal;
+    public float seedImag;
+
+    /*
+     * Filter 0: Normal
+     * Filter 1: Normal But without filling in the empty quadrants
+     * Filter 2: Edge Dectection Mode
+     */
+    public int filter = 0;
 
 
     /**
@@ -29,8 +43,17 @@ public class FractalMath {
         this.maxIter = maxIter;
         this.width = width;
         this.height = height;
-    }
+        this.data = new int[width][height];
+        this.tracer = new FractalEdgeTrace(this, data);
 
+        minReal = centerReal - 2.5f / zoom;
+        maxReal = centerReal + 2.5f / zoom;
+        minImag = centerImag - 2.0f / zoom;
+        maxImag = centerImag + 2.0f / zoom;
+
+        seedReal = 0;
+        seedImag = 0;
+    }
 
     /**
      * colors a pixel on the buffered image canvas depending on the 
@@ -43,7 +66,9 @@ public class FractalMath {
         int color = 0;
         if (iterations == maxIter ) {
             color = Color.BLACK.getRGB();
-        } else {
+        } else if (iterations == 0){
+            color = Color.WHITE.getRGB();
+        }else {
             float hue = (float) (iterations-1) / maxIter;
             color = Color.getHSBColor(hue, 1, 1).getRGB();
         }
@@ -52,14 +77,48 @@ public class FractalMath {
         }
     }
 
+    public void colorData(){
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if(filter == 0 || filter == 1) {
+                    setColor(x, y, data[x][y]);
+                } else {
+                    int edgeStrength = tracer.computeEdgeStrength(x, y);
+                    int edge = edgeStrength != 0 ? 255 : 0;
+                    setColor(x, y, edge);
+                } 
+                
+            }
+        }
+        frame.fractalListener.loadingZoom = false;
+    }
+
+    public int drawFractal(int x, int y){
+        if(seedImag == 0 || seedReal == 0){
+            return mandelbrotSet(x, y);
+        } else {
+            return juliaSet(x,y);
+        }
+    }
+
+    public void drawFractalPath(int x, int y){
+        if(seedImag == 0 || seedReal == 0){
+            drawMandelBrotSetPath(x, y);
+        } else {
+            drawJuliaSetPath(x,y);
+        }
+    }
+
+
 
     /**
      * calcualtes the mandelbrot set for the cordinates given
-     * @param real
-     * @param imag
-     * @return
+     * @param cordinate on the canvas
+     * @return the number of iterations it takes to complete calculation
      */
-    public int mandelbrotSet(float real, float imag) {
+    public int mandelbrotSet(int x, int y) {
+        float real = minReal + x * (maxReal - minReal) / width;
+        float imag = minImag + y * (maxImag - minImag) / height;
         int i = 0;
         float zReal = 0;
         float zImag = 0;
@@ -78,111 +137,112 @@ public class FractalMath {
     }
 
     /**
-     * calculates the fractal by flood filling the border around 
-     * the canvas until it reaches the black parts of the set and skips then in order to 
-     * not have to compute them
-     * @param threads
-     * @see FractalBorderTrace#run()
-     */
-    public void borderTraceCalculation() {
-        double startTime = System.nanoTime();
-        int[][] data = new int[width][height];
-        Queue<Point> queue = new LinkedList<Point>();
+    * Calculates the Julia set for the given coordinates.
+    * @param y cordinates on the canvas
+    * @return The number of iterations it takes to complete the calculation
+    */
+    public int juliaSet(int x, int y) {
+        float real = minReal + x * (maxReal - minReal) / width;
+        float imag = minImag + y * (maxImag - minImag) / height;
+        int i = 0;
+        float zReal = real;
+        float zImag = imag;
 
-        for (int x = 0; x < width; x++) {
-            queue.add(new Point(x, 0));
-            data[x][0] = -2;
-            queue.add(new Point(x, height - 1));
-            data[x][height - 1] = -2;
-        }
+        for (i = 0; i < maxIter; i++) {
+            float zRealTemp = zReal * zReal - zImag * zImag + seedReal;
+            zImag = 2 * zReal * zImag + seedImag;
+            zReal = zRealTemp;
 
-        for (int y = 1; y < height - 1; y++) {
-            queue.add(new Point(0, y));
-            data[0][y] = -2;
-            queue.add(new Point(width - 1, y));
-            data[width - 1][y] = -2;
-        }
-
-        // Start threads for border tracing
-        ArrayList<FractalBorderTrace> threadList = new ArrayList<FractalBorderTrace>();
-        for (int i = 0; i < 1; i++) {
-            FractalBorderTrace thread = new FractalBorderTrace(this, queue, data);
-            thread.start();
-            threadList.add(thread);
-        }
-    
-        // Wait for all threads to finish
-        for (FractalBorderTrace thread : threadList) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            if ((zReal * zReal) + (zImag * zImag) > 4) {
+                break;
             }
         }
-    
-        // Set colors on the canvas using the computed Mandelbrot set data
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                setColor(x, y, data[x][y]);
-            }
-        }
-    
-        // Update loading status
-        frame.fractalListener.loadingZoom = false;
-        System.out.println((System.nanoTime() - startTime));
+
+        return i;
     }
-    
+
 
     /**
-     * assigs threads to a array to calculate the iterations it takes to solve the 
-     * fractal faster than it would take to just loop through every pixel
-     * @param threads
-     * @see FractalThreading#run()
+     * draws the path the fractal takes at that point and draws it on the canvas
+     * @param cordinate on the canvas
      */
-    public void multiThreadCalculateFractal(int threads) {
-        double startTime = System.nanoTime();
-        ArrayList<FractalThreading> threadList = new ArrayList<FractalThreading>();
-        int[][] data = new int[width][height];
-        for (int i = 0; i < threads; i++) {
-            FractalThreading thread = new FractalThreading(this, i, threads, data);
-            thread.start();
-            threadList.add(thread);
-        }
+    public void drawMandelBrotSetPath(int x, int y) {
+        float real = minReal + x * (maxReal - minReal) / width;
+        float imag = minImag + y * (maxImag - minImag) / height;
+        float zReal = 0;
+        float zImag = 0;
+        Point prev = null;
+        Point current = null;
+        for (int i = 0; i < 100; i++) {
+            float zRealTemp = zReal * zReal - zImag * zImag + real;
+            zImag = 2 * zReal * zImag + imag;
+            zReal = zRealTemp;
 
-        for (FractalThreading thread : threadList) {
-            try {
-                thread.join();
-                thread.postRun();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            current = imagToPixel(zReal, zImag);
+            frame.drawLine(current, prev);
+            prev = current;
+            if ((zReal * zReal) + (zImag * zImag) > 4) {
+                break;
             }
         }
-        //new FractalEdgeTrace(this,width,height,data).applyEdgeDetection();
-        
-        frame.fractalListener.loadingZoom = false;
-        System.out.println((System.nanoTime()-startTime));
-
     }
 
-    public void edgeDetectionFractal() {
-        double startTime = System.nanoTime();
-        ArrayList<FractalThreading> threadList = new ArrayList<FractalThreading>();
-        int[][] data = new int[width][height];
+     /**
+     * draws the path the fractal takes at that point and draws it on the canvas
+     * @param cordinate on the canvas
+     */
+    public void drawJuliaSetPath(int x, int y) {
+        float real = minReal + x * (maxReal - minReal) / width;
+        float imag = minImag + y * (maxImag - minImag) / height;
+        float zReal = real;
+        float zImag = imag;
+        Point prev = null;
+        Point current = null;
+        for (int i = 0; i < 100; i++) {
+            float zRealTemp = zReal * zReal - zImag * zImag + seedReal;
+            zImag = 2 * zReal * zImag + seedImag;
+            zReal = zRealTemp;
 
-        FractalEdgeTrace tracer = new FractalEdgeTrace(this, data);
-        tracer.calculateEdgeFractal();
-
-        //color it
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                
-                setColor(x, y, data[x][y]);
-                
+            current = imagToPixel(zReal, zImag);
+            frame.drawLine(current, prev);
+            prev = current;
+            if ((zReal * zReal) + (zImag * zImag) > 4) {
+                break;
             }
         }
+    }
+    /**
+     * @param point on the fractal
+     * @return point on the canvas
+     */
+     public Point imagToPixel(float real, float imag) {
+        int x = (int) ((real - minReal) / (maxReal - minReal) * width);
+        int y = (int) ((imag - minImag) / (maxImag - minImag) * height);
+        return new Point(x, y);
+    }
 
-        frame.fractalListener.loadingZoom = false;
-        System.out.println((System.nanoTime()-startTime));
+    /**
+     * @param point on the fractal
+     * @return point on the canvas
+     */
+     public float xToReal(int x) {
+        float real = minReal + x * (maxReal - minReal) / width;
+        return real;
+    }
+
+    /**
+     * @param point on the fractal
+     * @return point on the canvas
+     */
+    public float yToImag(int y) {
+        float imag = minImag + y * (maxImag - minImag) / height;
+        return imag;
+    }
+    
+    
+
+    public void edgeDetectionFractal() {
+        tracer.calculateEdgeFractal(16);
     }
 
     /**
@@ -198,6 +258,11 @@ public class FractalMath {
 
         centerReal -= dx * realIncrement;
         centerImag -= dy * imagIncrement;
+
+        minReal = centerReal - 2.5f / zoom;
+        maxReal = centerReal + 2.5f / zoom;
+        minImag = centerImag - 2.0f / zoom;
+        maxImag = centerImag + 2.0f / zoom;
     }
 
 
@@ -208,6 +273,11 @@ public class FractalMath {
      */
     public void updateZoomLevel(double zoomFactor) {
         zoom *= zoomFactor;
+
+        minReal = centerReal - 2.5f / zoom;
+        maxReal = centerReal + 2.5f / zoom;
+        minImag = centerImag - 2.0f / zoom;
+        maxImag = centerImag + 2.0f / zoom;
         
     }
 }

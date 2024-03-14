@@ -9,11 +9,11 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
+import javax.swing.SwingUtilities;
+
 public class FractalListener implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener{
 
     FractalFrame frame;
-    private int mouseX;
-    private int mouseY;
     private Point onDrag;
     public boolean loadingZoom;
 
@@ -24,7 +24,8 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if(onDrag == null) {
+        if (SwingUtilities.isLeftMouseButton(e)) {
+        if (onDrag == null) {
             onDrag = e.getPoint();
         }
         Point current = e.getPoint();
@@ -32,6 +33,10 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
         int dy = current.y - onDrag.y;
         frame.updateOffset(dx, dy);
         onDrag = current;
+    } else if (SwingUtilities.isRightMouseButton(e)) {
+        frame.setFractalSeed(e.getX(),e.getY());
+    }
+
     }
 
     /* 
@@ -39,13 +44,11 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
      */
     @Override
     public void mouseMoved(MouseEvent e) {
-        mouseX = e.getX();
-        mouseY = e.getY();
+        frame.calculateFractalPath(e.getX(),e.getY());
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        System.out.println("Mouse Clicked - ("+mouseX+", "+mouseY+")");
     }
 
     @Override
@@ -54,11 +57,15 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
 
     @Override
     public void mouseExited(MouseEvent e) {
+        
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         onDrag = e.getPoint();
+        if (SwingUtilities.isRightMouseButton(e)) {
+            frame.setFractalSeed(e.getX(),e.getY());
+        }
     }
 
     @Override
@@ -74,6 +81,15 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
             frame.dispose();
             System.exit(0);
+        }
+
+        if(e.getKeyCode() == KeyEvent.VK_SPACE){
+            frame.fractalMath.filter = (++frame.fractalMath.filter) % 3;
+            frame.calculateFractal();
+        }
+
+        if(e.getKeyCode() == KeyEvent.VK_R){
+            frame.resetFractal();
         }
 
     }
