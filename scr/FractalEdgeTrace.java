@@ -125,11 +125,11 @@ public class FractalEdgeTrace {
         //in order to save on calculations
         if(lineDetected){
             //if quadrant is too small then just render all the pixels
-            if(sectorHeight > 2){
-                renderRectangle(startX,                 startY,                 sectorWidth/2,sectorHeight/2);
-                renderRectangle(startX+sectorWidth/2,   startY,                 sectorWidth/2,sectorHeight/2);
-                renderRectangle(startX,                 startY+sectorHeight/2,  sectorWidth/2,sectorHeight/2);
-                renderRectangle(startX+sectorWidth/2,   startY+sectorHeight/2,  sectorWidth/2,sectorHeight/2);
+            if(sectorHeight > 3){
+                renderRectangle((startX)+1,                 (startY+1),                 (sectorWidth/2),(sectorHeight/2));
+                renderRectangle((startX+sectorWidth/2)+1,   (startY)+1,                 (sectorWidth/2)-1,(sectorHeight/2)-1);
+                renderRectangle((startX)+1,                 (startY+sectorHeight/2)+1,  (sectorWidth/2)-1,(sectorHeight/2)-1);
+                renderRectangle((startX+sectorWidth/2),   (startY+sectorHeight/2),  (sectorWidth/2),(sectorHeight/2));
             } else {
                 fullRenderRectangle(startX,startY,sectorWidth,sectorHeight);
             }

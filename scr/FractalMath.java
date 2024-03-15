@@ -195,13 +195,17 @@ public class FractalMath {
         int i = 1;
         double zReal = 0;
         double zImag = 0;
+        double realSqr = 0;
+        double imagSqr = 0;
 
         //run as long as it does not escape the fractal or exeeds the iteration limit
-        while ((zReal * zReal) + (zImag * zImag) < 4 && i <= maxIter) {
+        while ((realSqr + imagSqr) < 4 && i < maxIter) {
             //iterate through the fractal
-            double zRealTemp = zReal * zReal - zImag * zImag + real;
             zImag = 2 * zReal * zImag + imag;
-            zReal = zRealTemp;
+            zReal = realSqr - imagSqr + real;
+            //only calc the squared real and imag for optimization
+            realSqr = zReal*zReal;
+            imagSqr = zImag*zImag;
 
             i++;
         }
@@ -215,18 +219,23 @@ public class FractalMath {
     * @return The number of iterations it takes to complete the calculation
     */
     public int juliaSet(int x, int y) {
-        double real = minReal + x * (maxReal - minReal) / width;
-        double imag = minImag + y * (maxImag - minImag) / height;
+        double zReal = minReal + x * (maxReal - minReal) / width;
+        double zImag = minImag + y * (maxImag - minImag) / height;
         int i = 1;
-        double zReal = real;
-        double zImag = imag;
-
+       // double realSqr = 0;
+       // double imagSqr = 0;
         //run as long as it does not escape the fractal or exeeds the iteration limit
-        while ((zReal * zReal) + (zImag * zImag) < 4 && i <= maxIter) {
+        while ((zReal * zReal + zImag * zImag) < 4 && i < maxIter) {
             //iterate through the fractal
             double zRealTemp = zReal * zReal - zImag * zImag + seedReal;
             zImag = 2 * zReal * zImag + seedImag;
             zReal = zRealTemp;
+            
+            //zImag = 2 * zReal * zImag + seedImag;
+            //zReal = realSqr - imagSqr + seedReal;
+            //only calc the squared real and imag for optimization
+            //realSqr = zReal*zReal;
+            //imagSqr = zImag*zImag;
 
            i++;
         }
@@ -249,7 +258,7 @@ public class FractalMath {
         Point current = null;
 
         //run as long as it does not escape the fractal or exeeds the iteration limit
-        while ((zReal * zReal) + (zImag * zImag) < 4 && i <= maxIter) {
+        while ((zReal * zReal) + (zImag * zImag) < 4 && i < maxIter) {
             //iterate through the fractal
             double zRealTemp = zReal * zReal - zImag * zImag + real;
             zImag = 2 * zReal * zImag + imag;
@@ -268,15 +277,13 @@ public class FractalMath {
      * @param cordinate on the canvas
      */
     public void drawJuliaSetPath(int x, int y) {
-        double real = minReal + x * (maxReal - minReal) / width;
-        double imag = minImag + y * (maxImag - minImag) / height;
-        double zReal = real;
-        double zImag = imag;
+        double zReal = minReal + x * (maxReal - minReal) / width;
+        double zImag = minImag + y * (maxImag - minImag) / height;
         int i = 0;
         Point prev = null;
         Point current = null;
         //run as long as it does not escape the fractal or exeeds the iteration limit
-        while ((zReal * zReal) + (zImag * zImag) < 4 && i <= maxIter) {
+        while ((zReal * zReal) + (zImag * zImag) < 4 && i < maxIter) {
             //iterate through the fractal
             double zRealTemp = zReal * zReal - zImag * zImag + seedReal;
             zImag = 2 * zReal * zImag + seedImag;
