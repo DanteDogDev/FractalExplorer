@@ -41,7 +41,7 @@ public class FractalMath {
      * Filter 1: Normal But without filling in the empty quadrants
      * Filter 2: Edge Dectection Mode
      */
-    public int filter = 0;
+    public int filter = 1;
 
 
     /**
@@ -192,20 +192,18 @@ public class FractalMath {
     public int mandelbrotSet(int x, int y) {
         double real = minReal + x * (maxReal - minReal) / width;
         double imag = minImag + y * (maxImag - minImag) / height;
-        int i = 0;
+        int i = 1;
         double zReal = 0;
         double zImag = 0;
 
-        for (i = 1; i < maxIter; i++) {
+        //run as long as it does not escape the fractal or exeeds the iteration limit
+        while ((zReal * zReal) + (zImag * zImag) < 4 && i <= maxIter) {
             //iterate through the fractal
             double zRealTemp = zReal * zReal - zImag * zImag + real;
             zImag = 2 * zReal * zImag + imag;
             zReal = zRealTemp;
 
-            //if it gets too big its solved
-            if ((zReal * zReal) + (zImag * zImag) > 4) {
-                break;
-            }
+            i++;
         }
 
         return i;
@@ -219,20 +217,18 @@ public class FractalMath {
     public int juliaSet(int x, int y) {
         double real = minReal + x * (maxReal - minReal) / width;
         double imag = minImag + y * (maxImag - minImag) / height;
-        int i = 0;
+        int i = 1;
         double zReal = real;
         double zImag = imag;
 
-        for (i = 1; i < maxIter; i++) {
+        //run as long as it does not escape the fractal or exeeds the iteration limit
+        while ((zReal * zReal) + (zImag * zImag) < 4 && i <= maxIter) {
             //iterate through the fractal
             double zRealTemp = zReal * zReal - zImag * zImag + seedReal;
             zImag = 2 * zReal * zImag + seedImag;
             zReal = zRealTemp;
 
-            //if it gets too big its solved
-            if ((zReal * zReal) + (zImag * zImag) > 4) {
-                break;
-            }
+           i++;
         }
 
         return i;
@@ -248,9 +244,12 @@ public class FractalMath {
         double imag = minImag + y * (maxImag - minImag) / height;
         double zReal = 0;
         double zImag = 0;
+        int i = 0;
         Point prev = null;
         Point current = null;
-        for (int i = 0; i < 100; i++) {
+
+        //run as long as it does not escape the fractal or exeeds the iteration limit
+        while ((zReal * zReal) + (zImag * zImag) < 4 && i <= maxIter) {
             //iterate through the fractal
             double zRealTemp = zReal * zReal - zImag * zImag + real;
             zImag = 2 * zReal * zImag + imag;
@@ -260,10 +259,7 @@ public class FractalMath {
             frame.drawLine(current, prev);
             prev = current;
 
-            //if it gets too big its solved
-            if ((zReal * zReal) + (zImag * zImag) > 4) {
-                break;
-            }
+            i++;
         }
     }
 
@@ -276,9 +272,11 @@ public class FractalMath {
         double imag = minImag + y * (maxImag - minImag) / height;
         double zReal = real;
         double zImag = imag;
+        int i = 0;
         Point prev = null;
         Point current = null;
-        for (int i = 0; i < 100; i++) {
+        //run as long as it does not escape the fractal or exeeds the iteration limit
+        while ((zReal * zReal) + (zImag * zImag) < 4 && i <= maxIter) {
             //iterate through the fractal
             double zRealTemp = zReal * zReal - zImag * zImag + seedReal;
             zImag = 2 * zReal * zImag + seedImag;
@@ -287,11 +285,8 @@ public class FractalMath {
             current = imagToPixel(zReal, zImag);
             frame.drawLine(current, prev);
             prev = current;
-
-            //if it gets too big its solved
-            if ((zReal * zReal) + (zImag * zImag) > 4) {
-                break;
-            }
+            
+            i++;
         }
     }
 

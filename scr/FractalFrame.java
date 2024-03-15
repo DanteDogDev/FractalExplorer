@@ -55,11 +55,11 @@ public class FractalFrame extends JFrame {
         setupCanvas();
     
         // Make the frame visible
-        setVisible(true);
+        //setVisible(true);
     
         // Enable double bufferinga
-        createBufferStrategy(2);
-        bufferStrategy = getBufferStrategy();
+        //createBufferStrategy(2);
+        //bufferStrategy = getBufferStrategy();
 
         // calculating fractals
         fractalMath = new FractalMath(this, maxIterations, canvasWidth, canvasHeight);
@@ -140,6 +140,24 @@ public class FractalFrame extends JFrame {
         repaint();
     }
 
+    public void calculateAverageTime() {
+        long totalDuration = 0;
+
+        for (int i = 0; i < 100; i++) {
+            System.out.print("*");
+            long startTime = System.nanoTime();
+            fractalMath.edgeDetectionFractal();
+            fractalMath.colorData();
+            repaint();
+            long endTime = System.nanoTime();
+            long duration = (endTime - startTime) / 1000000;
+            totalDuration += duration;
+        }
+        long averageDuration = totalDuration / 100;
+        System.out.println("\nAverage time taken for 100 iterations: " + averageDuration + " milliseconds");
+
+    }
+
     public void calculateFractalPath(int x, int y){
         fractalMath.colorData();
         fractalMath.drawFractalPath(x,y);
@@ -172,7 +190,7 @@ public class FractalFrame extends JFrame {
     
     public static void main(String[] args) {
         FractalFrame frame = new FractalFrame(100);
-        frame.calculateFractal();
+        frame.calculateAverageTime();
     }
 
     
