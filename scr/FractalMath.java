@@ -19,7 +19,7 @@ public class FractalMath {
 
     
     //data used by the program
-    private int[][] data;
+    public int[][] data;
     private List<Color> colors;
 
     // where on the fractal to view
@@ -57,7 +57,7 @@ public class FractalMath {
         this.height = height;
         this.data = new int[width][height];
         this.tracer = new FractalEdgeTrace(this, data);
-        colors = generateColorPattern(100);
+        colors = generateColorPattern(50);
 
         minReal = centerReal - 2.5f / zoom;
         maxReal = centerReal + 2.5f / zoom;
@@ -330,7 +330,7 @@ public class FractalMath {
      * @see FractalEdgeTrace#calculateEdgeFractal(int)
      */
     public void edgeDetectionFractal() {
-        tracer.calculateEdgeFractal(16);
+        tracer.calculateEdgeFractal(1);
     }
 
     /**

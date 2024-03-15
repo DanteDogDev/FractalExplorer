@@ -8,9 +8,8 @@
  */
 package scr;
 
-//import java.util.concurrent.ExecutorService;
-//import java.util.concurrent.Executors;
-//import java.util.concurrent.TimeUnit;
+// import java.util.concurrent.ExecutorService;
+// import java.util.concurrent.Executors;
 
 public class FractalEdgeTrace {
 
@@ -29,7 +28,7 @@ public class FractalEdgeTrace {
      * @see this{@link #renderRectangle(int, int, int, int)}
      */
     public void calculateEdgeFractal(int numThreads){
-        int sectorNum = 1;
+        int sectorNum = 8;
         int sectorWidth = (math.width/sectorNum);
         int sectorHeight = (math.height/sectorNum);
         //ExecutorService executor = Executors.newFixedThreadPool(numThreads);
@@ -38,20 +37,20 @@ public class FractalEdgeTrace {
             final int startX = i / sectorNum * sectorWidth;
             final int startY = i % sectorNum * sectorHeight;
             //assigns workload to the threads
-            //executor.execute(() -> renderRectangle(startX, startY, sectorWidth, sectorHeight))s;
+            //executor.execute(() -> renderRectangle(startX, startY, sectorWidth, sectorHeight));
             renderRectangle(startX, startY, sectorWidth, sectorHeight);
         }
 
 
         ////waits for all the threads to be finnished
-        //executor.shutdown();
-        //try {
-        //    executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        //} catch (InterruptedException e) {
-        //    // will force the working thread to close
-        //    Thread.currentThread().interrupt();
-        //}
-
+        // executor.shutdown();
+        // while(!executor.isTerminated()) {
+        //     try {
+        //         //
+        //     } catch (Exception e) {
+        //         System.out.println("Error:"+e);
+        //     }
+        // }
 
 
     }
@@ -83,6 +82,7 @@ public class FractalEdgeTrace {
         y = startY;
         for(x = startX;x < startX+sectorWidth;x++){
             data[x][y] = math.drawFractal(x, y);
+            
             if(data[x][y] != control){
                 lineDetected = true;
             }
@@ -91,6 +91,7 @@ public class FractalEdgeTrace {
         y = startY+sectorHeight-1;
         for(x = startX;x < startX+sectorWidth;x++){
             data[x][y] = math.drawFractal(x, y);
+            
             if(data[x][y] != control){
                 lineDetected = true;
             }
@@ -99,6 +100,7 @@ public class FractalEdgeTrace {
         x = startX;
         for(y = startY;y < startY+sectorHeight;y++){
             data[x][y] = math.drawFractal(x, y);
+            
             if(data[x][y] != control){
                 lineDetected = true;
             }
@@ -107,6 +109,7 @@ public class FractalEdgeTrace {
         x = startX+sectorWidth-1;
         for(y = startY;y < startY+sectorHeight;y++){
             data[x][y] = math.drawFractal(x, y);
+            
             if(data[x][y] != control){
                 lineDetected = true;
             }
@@ -202,5 +205,5 @@ public class FractalEdgeTrace {
         return (int) Math.sqrt(sumX * sumX + sumY * sumY);
     }
     
-
+    
 }

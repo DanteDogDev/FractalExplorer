@@ -162,7 +162,7 @@ public class FractalFrame extends JFrame {
             return;
         }
         Graphics g = canvas.getGraphics();
-        g.setColor(Color.RED); // You can change the color if needed
+        g.setColor(Color.GRAY); // You can change the color if needed
         g.drawLine(p1.x, p1.y, p2.x, p2.y); 
         g.dispose(); // Dispose the Graphics object to free resources
     }
@@ -171,7 +171,7 @@ public class FractalFrame extends JFrame {
     
     
     public static void main(String[] args) {
-        FractalFrame frame = new FractalFrame(80);
+        FractalFrame frame = new FractalFrame(100);
         frame.calculateFractal();
     }
 
