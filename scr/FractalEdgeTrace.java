@@ -37,7 +37,7 @@ public class FractalEdgeTrace {
             final int startX = i / sectorNum * sectorWidth;
             final int startY = i % sectorNum * sectorHeight;
             //assigns workload to the threads
-            executor.execute(() -> renderRectangle(startX, startY, sectorWidth, sectorHeight));
+            executor.execute(() -> renderRectangle(startX, startY, sectorWidth, sectorHeight,0));
             //renderRectangle(startX, startY, sectorWidth, sectorHeight);
         }
 
@@ -70,7 +70,7 @@ public class FractalEdgeTrace {
      *    guaranteed to be one color because all 
      *    the edges of the rectangle had been a single color
      */
-    public void renderRectangle(int startX, int startY, int sectorWidth, int sectorHeight){
+    public void renderRectangle(int startX, int startY, int sectorWidth, int sectorHeight, int sector){
         boolean lineDetected = false;
         int controlIteration = math.drawFractal(startX, startY);
         math.setColor(startX,startY,controlIteration);
@@ -79,39 +79,26 @@ public class FractalEdgeTrace {
         int x = 0;
         int y = 0;
         //top edge
-        // y = startY;
-        // for(x = startX+1;x < startX+sectorWidth;x++){
-        //     math.setColor(x,y,math.drawFractal(x, y));
+        y = startY;
+        for(x = startX+1;x < startX+sectorWidth;x++){
+            math.setColor(x,y,math.drawFractal(x, y));
             
-        //     if(math.getColor(x,y) != control){
-        //         lineDetected = true;
-        //     }
-        // }
-        for(int i = 1;i< sectorWidth;i++){
-            math.setColor(pixelIndex+i,math.drawFractal(startX+i, startY));
-            if(math.getColor(pixelIndex+i) != control){
+            if(math.getColor(x,y) != control){
                 lineDetected = true;
             }
         }
         
         //bottom edge
-        // y = startY+sectorHeight-1;
-        // for(x = startX;x < startX+sectorWidth;x++){
-        //    math.setColor(x,y,math.drawFractal(x, y));
+        y = startY+sectorHeight-1;
+        for(x = startX;x < startX+sectorWidth;x++){
+           math.setColor(x,y,math.drawFractal(x, y));
            
-        //    if(math.getColor(x,y) != control){
-        //        lineDetected = true;
-        //    }
-        // }
-        pixelIndex = ((startY+sectorHeight-1)*math.width)+startX;
-        for(int i = 0;i< sectorWidth;i++){
-            math.setColor(pixelIndex+i,math.drawFractal(startX+i, startY+sectorHeight-1));
-            if(math.getColor(pixelIndex+i) != control){
-                lineDetected = true;
-            }
-        }   
+           if(math.getColor(x,y) != control){
+               lineDetected = true;
+           }
+        }
 
-        //left edge //OPTIMIZE
+        //left edge
         x = startX;
         for(y = startY;y < startY+sectorHeight;y++){
             math.setColor(x,y,math.drawFractal(x, y));
@@ -120,7 +107,7 @@ public class FractalEdgeTrace {
                 lineDetected = true;
             }
         }
-        //right edge //OPTIMIZE
+        //right edge
         x = startX+sectorWidth-1;
         for(y = startY;y < startY+sectorHeight;y++){
             math.setColor(x,y,math.drawFractal(x, y));
@@ -131,8 +118,8 @@ public class FractalEdgeTrace {
         }
         
         // Uncomment to see the fractal generate in real time (Dont try to zoom or drag the fractal)
-        //math.colorData();
-        //math.frame.repaint();
+        // math.colorData();
+        // math.frame.repaint();
 
         //if line is detected in quadrant split up the quadrant and look for the line
         //else
@@ -141,10 +128,10 @@ public class FractalEdgeTrace {
         if(lineDetected){
             //if quadrant is too small then just render all the pixels
             if(sectorHeight > 3){
-                renderRectangle((startX)+1,                 (startY+1),                 (sectorWidth/2),(sectorHeight/2));
-                renderRectangle((startX+sectorWidth/2)+1,   (startY)+1,                 (sectorWidth/2)-1,(sectorHeight/2)-1);
-                renderRectangle((startX)+1,                 (startY+sectorHeight/2)+1,  (sectorWidth/2)-1,(sectorHeight/2)-1);
-                renderRectangle((startX+sectorWidth/2),   (startY+sectorHeight/2),  (sectorWidth/2),(sectorHeight/2));
+                renderRectangle((startX)+1,                 (startY+1),                 (sectorWidth/2),    (sectorHeight/2)  ,1);
+                renderRectangle((startX+sectorWidth/2)+1,   (startY)+1,                 (sectorWidth/2)-1,  (sectorHeight/2)-1,2);
+                renderRectangle((startX)+1,                 (startY+sectorHeight/2)+1,  (sectorWidth/2)-1,  (sectorHeight/2)-1,3);
+                renderRectangle((startX+sectorWidth/2),     (startY+sectorHeight/2),    (sectorWidth/2),    (sectorHeight/2)  ,4);
             } else {
                 fullRenderRectangle(startX,startY,sectorWidth,sectorHeight);
             }

@@ -41,7 +41,7 @@ public class FractalMath {
      * Filter 1: Normal But without filling in the empty quadrants
      * Filter 2: Edge Dectection Mode
      */
-    public int filter = 0;
+    public int filter = 1;
 
 
     /**
