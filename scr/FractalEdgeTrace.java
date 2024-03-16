@@ -75,27 +75,43 @@ public class FractalEdgeTrace {
         int controlIteration = math.drawFractal(startX, startY);
         math.setColor(startX,startY,controlIteration);
         int control = math.getColor(startX, startY);
+        int pixelIndex = startY*math.width+startX;
         int x = 0;
         int y = 0;
         //top edge
-        y = startY;
-        for(x = startX+1;x < startX+sectorWidth;x++){
-            math.setColor(x,y,math.drawFractal(x, y));
+        // y = startY;
+        // for(x = startX+1;x < startX+sectorWidth;x++){
+        //     math.setColor(x,y,math.drawFractal(x, y));
             
-            if(math.getColor(x,y) != control){
+        //     if(math.getColor(x,y) != control){
+        //         lineDetected = true;
+        //     }
+        // }
+        for(int i = 1;i< sectorWidth;i++){
+            math.setColor(pixelIndex+i,math.drawFractal(startX+i, startY));
+            if(math.getColor(pixelIndex+i) != control){
                 lineDetected = true;
             }
         }
+        
         //bottom edge
-        y = startY+sectorHeight-1;
-        for(x = startX;x < startX+sectorWidth;x++){
-            math.setColor(x,y,math.drawFractal(x, y));
-            
-            if(math.getColor(x,y) != control){
+        // y = startY+sectorHeight-1;
+        // for(x = startX;x < startX+sectorWidth;x++){
+        //    math.setColor(x,y,math.drawFractal(x, y));
+           
+        //    if(math.getColor(x,y) != control){
+        //        lineDetected = true;
+        //    }
+        // }
+        pixelIndex = ((startY+sectorHeight-1)*math.width)+startX;
+        for(int i = 0;i< sectorWidth;i++){
+            math.setColor(pixelIndex+i,math.drawFractal(startX+i, startY+sectorHeight-1));
+            if(math.getColor(pixelIndex+i) != control){
                 lineDetected = true;
             }
-        }
-        //left edge
+        }   
+
+        //left edge //OPTIMIZE
         x = startX;
         for(y = startY;y < startY+sectorHeight;y++){
             math.setColor(x,y,math.drawFractal(x, y));
@@ -104,7 +120,7 @@ public class FractalEdgeTrace {
                 lineDetected = true;
             }
         }
-        //right edge
+        //right edge //OPTIMIZE
         x = startX+sectorWidth-1;
         for(y = startY;y < startY+sectorHeight;y++){
             math.setColor(x,y,math.drawFractal(x, y));

@@ -200,9 +200,9 @@ public class FractalFrame extends JFrame {
     
     public static void main(String[] args) {
         FractalFrame frame = new FractalFrame(100);
-        frame.setVisible(false);
-        frame.calculateAverageTime(100);
-        frame.dispose();
+        //frame.setVisible(false);
+        //frame.calculateAverageTime(100);
+        //frame.dispose();
     }
 
     

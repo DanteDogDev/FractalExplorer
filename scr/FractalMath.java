@@ -86,6 +86,14 @@ public class FractalMath {
         filter = 0;
     }
 
+    
+    public int getColor(int x, int y) {
+        return data[y * width + x];
+    }
+    public int getColor(int pixelIndex) {
+        return data[pixelIndex];
+    }
+
     /**
      * colors a pixel on the buffered image canvas depending on the 
      * number of iteration it took for the calculation to complete
@@ -94,10 +102,6 @@ public class FractalMath {
      * @see this{@link #generateColorPattern(int)}
      * @see this{@link #data}
      */
-    public int getColor(int x, int y) {
-        return data[y * width + x];
-    }
-
     public void setColor(int x,int y,int iterations){
         int color = 0;
         if (iterations == maxIter ) {
@@ -109,6 +113,19 @@ public class FractalMath {
         }
         
         data[y * width + x] = color;
+    }
+
+    public void setColor(int pixelIndex,int iterations){
+        int color = 0;
+        if (iterations == maxIter ) {
+            color = Color.BLACK.getRGB(); // color pixel black
+        } else if (iterations == 0){
+            color = Color.WHITE.getRGB(); // color pixel white
+        }else {
+            color = colors.get(iterations%colors.size()).getRGB(); // color pixel based on a gradient
+        }
+        
+        data[pixelIndex] = color;
     }
 
 
