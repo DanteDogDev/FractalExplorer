@@ -41,7 +41,7 @@ public class FractalMath {
      * Filter 1: Normal But without filling in the empty quadrants
      * Filter 2: Edge Dectection Mode
      */
-    public int filter = 1;
+    public int filter = 0;
 
 
     /**
@@ -94,7 +94,7 @@ public class FractalMath {
      * @see this{@link #generateColorPattern(int)}
      * @see this{@link #data}
      */
-    public void setColor(int x, int y, int iterations) {
+    public int getColor(int x, int y, int iterations) {
         int color = 0;
         if (iterations == maxIter ) {
             color = Color.BLACK.getRGB(); // color pixel black
@@ -103,9 +103,8 @@ public class FractalMath {
         }else {
             color = colors.get(iterations%colors.size()).getRGB(); // color pixel based on a gradient
         }
-        if(frame.canvas.getRGB(x, y) != color){
-            frame.canvas.setRGB(x, y, color);
-        }
+        return color;
+        //frame.canvas.setRGB(x, y, color);
     }
 
     /**
@@ -117,6 +116,25 @@ public class FractalMath {
      * @see this{@link #data}
      */
     public void colorData(){
+        int[] colorArr = new int[width * height];
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int pixelIndex = y * width + x;
+                int color = 0;
+                if(filter == 0 || filter == 1) {
+                    color = getColor(x, y, data[x][y]);
+                } else {
+                    int edgeStrength = tracer.computeEdgeStrength(x, y);
+                    int edge = edgeStrength != 0 ? 255 : 0;
+                    color = getColor(x, y, edge);
+                } 
+                colorArr[pixelIndex] = color;
+            }
+        }
+        frame.canvas.setRGB(0, 0, width, height, colorArr, 0, width);
+        
+        /* 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 if(filter == 0 || filter == 1) {
@@ -128,7 +146,7 @@ public class FractalMath {
                 } 
                 
             }
-        }
+        }*/
         frame.fractalListener.loadingZoom = false;
     }
 
@@ -160,7 +178,7 @@ public class FractalMath {
      * @see this{@link #juliaSet(int, int)}
      */
     public int drawFractal(int x, int y){
-        if(seedImag == 0 || seedReal == 0){
+        if(seedImag == 0 && seedReal == 0){
             return mandelbrotSet(x, y);
         } else {
             return juliaSet(x,y);
@@ -175,7 +193,7 @@ public class FractalMath {
      * @see this{@link #drawJuliaSetPath(int, int)}
      */
     public void drawFractalPath(int x, int y){
-        if(seedImag == 0 || seedReal == 0){
+        if(seedImag == 0 && seedReal == 0){
             drawMandelBrotSetPath(x, y);
         } else {
             drawJuliaSetPath(x,y);
@@ -203,11 +221,10 @@ public class FractalMath {
             //iterate through the fractal
             zImag = 2 * zReal * zImag + imag;
             zReal = realSqr - imagSqr + real;
+            i++;
             //only calc the squared real and imag for optimization
             realSqr = zReal*zReal;
             imagSqr = zImag*zImag;
-
-            i++;
         }
 
         return i;
@@ -222,22 +239,17 @@ public class FractalMath {
         double zReal = minReal + x * (maxReal - minReal) / width;
         double zImag = minImag + y * (maxImag - minImag) / height;
         int i = 1;
-       // double realSqr = 0;
-       // double imagSqr = 0;
+        double realSqr = zReal*zReal;
+        double imagSqr = zImag*zImag;
         //run as long as it does not escape the fractal or exeeds the iteration limit
         while ((zReal * zReal + zImag * zImag) < 4 && i < maxIter) {
             //iterate through the fractal
-            double zRealTemp = zReal * zReal - zImag * zImag + seedReal;
             zImag = 2 * zReal * zImag + seedImag;
-            zReal = zRealTemp;
-            
-            //zImag = 2 * zReal * zImag + seedImag;
-            //zReal = realSqr - imagSqr + seedReal;
+            zReal = realSqr - imagSqr + seedReal;
+            i++;
             //only calc the squared real and imag for optimization
-            //realSqr = zReal*zReal;
-            //imagSqr = zImag*zImag;
-
-           i++;
+            realSqr = zReal*zReal;
+            imagSqr = zImag*zImag;
         }
 
         return i;
@@ -249,27 +261,43 @@ public class FractalMath {
      * @param cordinate on the canvas
      */
     public void drawMandelBrotSetPath(int x, int y) {
+        ArrayList<Double> realPoint = new ArrayList<Double>();
+        ArrayList<Double> imagPoint = new ArrayList<Double>();
         double real = minReal + x * (maxReal - minReal) / width;
         double imag = minImag + y * (maxImag - minImag) / height;
+        int i = 1;
         double zReal = 0;
         double zImag = 0;
-        int i = 0;
+        double realSqr = 0;
+        double imagSqr = 0;
+
         Point prev = null;
         Point current = null;
 
         //run as long as it does not escape the fractal or exeeds the iteration limit
-        while ((zReal * zReal) + (zImag * zImag) < 4 && i < maxIter) {
+        while ((zReal * zReal) + (zImag * zImag) < 4 && i < 100) {
             //iterate through the fractal
-            double zRealTemp = zReal * zReal - zImag * zImag + real;
             zImag = 2 * zReal * zImag + imag;
-            zReal = zRealTemp;
-
+            zReal = realSqr - imagSqr + real;
+            realPoint.add(zReal);
+            imagPoint.add(zImag);
+            i++;
+            //only calc the squared real and imag for optimization
+            realSqr = zReal*zReal;
+            imagSqr = zImag*zImag;
+            //draw line
             current = imagToPixel(zReal, zImag);
             frame.drawLine(current, prev);
             prev = current;
-
-            i++;
         }
+        double realPoints= 0;
+        double imagPoints = 0;
+        for(int j = 0;j<realPoint.size();j++){
+            realPoints += realPoint.get(j);
+            imagPoints += imagPoint.get(j);
+            frame.drawDot(imagToPixel(realPoint.get(j), imagPoint.get(j)),Color.ORANGE);
+        }
+        frame.drawDot(imagToPixel(realPoints/realPoint.size(), imagPoints/imagPoint.size()),Color.RED);
     }
 
      /**
@@ -277,24 +305,41 @@ public class FractalMath {
      * @param cordinate on the canvas
      */
     public void drawJuliaSetPath(int x, int y) {
+        ArrayList<Double> realPoint = new ArrayList<Double>();
+        ArrayList<Double> imagPoint = new ArrayList<Double>();
         double zReal = minReal + x * (maxReal - minReal) / width;
         double zImag = minImag + y * (maxImag - minImag) / height;
-        int i = 0;
-        Point prev = null;
+        int i = 1;
+        double realSqr = zReal*zReal;
+        double imagSqr = zImag*zImag;
+
+        Point prev = imagToPixel(zReal, zImag);
         Point current = null;
         //run as long as it does not escape the fractal or exeeds the iteration limit
         while ((zReal * zReal) + (zImag * zImag) < 4 && i < maxIter) {
+            realPoint.add(zReal);
+            imagPoint.add(zImag);
             //iterate through the fractal
-            double zRealTemp = zReal * zReal - zImag * zImag + seedReal;
             zImag = 2 * zReal * zImag + seedImag;
-            zReal = zRealTemp;
-
+            zReal = realSqr - imagSqr + seedReal;
+            i++;
+            //only calc the squared real and imag for optimization
+            realSqr = zReal*zReal;
+            imagSqr = zImag*zImag;
+            //draw line
             current = imagToPixel(zReal, zImag);
             frame.drawLine(current, prev);
             prev = current;
             
-            i++;
         }
+        double realPoints= 0;
+        double imagPoints = 0;
+        for(int j = 0;j<realPoint.size();j++){
+            realPoints += realPoint.get(j);
+            imagPoints += imagPoint.get(j);
+            frame.drawDot(imagToPixel(realPoint.get(j), imagPoint.get(j)),Color.BLUE);
+        }
+        frame.drawDot(imagToPixel(realPoints/realPoint.size(), imagPoints/imagPoint.size()),Color.RED);
     }
 
     /**
@@ -332,7 +377,7 @@ public class FractalMath {
      * @see FractalEdgeTrace#calculateEdgeFractal(int)
      */
     public void edgeDetectionFractal() {
-        tracer.calculateEdgeFractal(1);
+        tracer.calculateEdgeFractal(8);
     }
 
     /**
@@ -345,15 +390,9 @@ public class FractalMath {
     public void updateOffset(int dx, int dy) {
         double realIncrement = (2.5f / zoom) / width;
         double imagIncrement = (2.0f / zoom) / height;
-
         centerReal -= dx * realIncrement;
         centerImag -= dy * imagIncrement;
-
-        //recalculates the position of the fractal
-        minReal = centerReal - 2.5f / zoom;
-        maxReal = centerReal + 2.5f / zoom;
-        minImag = centerImag - 2.0f / zoom;
-        maxImag = centerImag + 2.0f / zoom;
+        recalculateBorders();
     }
 
 
@@ -364,12 +403,14 @@ public class FractalMath {
      */
     public void updateZoomLevel(double zoomFactor) {
         zoom *= zoomFactor;
+        recalculateBorders();
+    }
 
+    public void recalculateBorders(){
         //recalculates the position of the fractal
         minReal = centerReal - 2.5f / zoom;
         maxReal = centerReal + 2.5f / zoom;
         minImag = centerImag - 2.0f / zoom;
         maxImag = centerImag + 2.0f / zoom;
-        
     }
 }

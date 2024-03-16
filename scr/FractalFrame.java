@@ -25,11 +25,11 @@ public class FractalFrame extends JFrame {
     public FractalListener fractalListener;
     public FractalMath fractalMath;
     public BufferedImage canvas;
-    private int canvasWidth;
-    private int canvasHeight;
+    public int canvasWidth;
+    public int canvasHeight;
     private BufferStrategy bufferStrategy;
 
-    public double scale = 1;
+    public double scale = 2;
 
     public FractalFrame(int maxIterations) {
         super("Fractal Explorer");
@@ -145,7 +145,7 @@ public class FractalFrame extends JFrame {
         long totalDuration = 0;
 
         for (int i = 0; i < iterations; i++) {
-            System.out.print("*");
+            //System.out.print("*");
             long startTime = System.nanoTime();
             fractalMath.edgeDetectionFractal();
             fractalMath.colorData();
@@ -155,7 +155,7 @@ public class FractalFrame extends JFrame {
             totalDuration += duration;
         }
         double averageDuration = totalDuration / ((double)iterations);
-        System.out.println("\nAverage time taken for "+iterations+" iterations: " + averageDuration + " milliseconds");
+        System.out.println("Average Time for "+iterations+" iterations of "+fractalMath.maxIter+" precision: " + averageDuration + " milliseconds");
 
     }
 
@@ -185,15 +185,24 @@ public class FractalFrame extends JFrame {
         g.drawLine(p1.x, p1.y, p2.x, p2.y); 
         g.dispose(); // Dispose the Graphics object to free resources
     }
+    public void drawDot(Point p,Color color) {
+        if(p == null){
+            return;
+        }
+        Graphics g = canvas.getGraphics();
+        g.setColor(color); // You can change the color if needed
+        g.drawOval(p.x, p.y, 2, 2); 
+        g.dispose(); // Dispose the Graphics object to free resources
+    }
 
 
     
     
     public static void main(String[] args) {
-        FractalFrame frame = new FractalFrame(100);
-        frame.setVisible(false);
-        //frame.calculateAverageTime(1000);
-        frame.setVisible(true);
+        FractalFrame frame = new FractalFrame(80);
+        //frame.setVisible(false);
+        //frame.calculateAverageTime(100);
+        //frame.dispose();
     }
 
     
