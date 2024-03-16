@@ -14,9 +14,9 @@ import java.util.concurrent.Executors;
 public class FractalEdgeTrace {
 
     private FractalMath math;
-    private int[][] data;
+    private int[] data;
 
-    public FractalEdgeTrace(FractalMath math, int[][] data) {
+    public FractalEdgeTrace(FractalMath math, int[] data) {
         this.math = math;
         this.data = data;
     }
@@ -72,43 +72,44 @@ public class FractalEdgeTrace {
      */
     public void renderRectangle(int startX, int startY, int sectorWidth, int sectorHeight){
         boolean lineDetected = false;
-        int control = math.drawFractal(startX, startY);
-        data[startX][startY] = control;
+        int controlIteration = math.drawFractal(startX, startY);
+        math.setColor(startX,startY,controlIteration);
+        int control = math.getColor(startX, startY);
         int x = 0;
         int y = 0;
         //top edge
         y = startY;
         for(x = startX+1;x < startX+sectorWidth;x++){
-            data[x][y] = math.drawFractal(x, y);
+            math.setColor(x,y,math.drawFractal(x, y));
             
-            if(data[x][y] != control){
+            if(math.getColor(x,y) != control){
                 lineDetected = true;
             }
         }
         //bottom edge
         y = startY+sectorHeight-1;
         for(x = startX;x < startX+sectorWidth;x++){
-            data[x][y] = math.drawFractal(x, y);
+            math.setColor(x,y,math.drawFractal(x, y));
             
-            if(data[x][y] != control){
+            if(math.getColor(x,y) != control){
                 lineDetected = true;
             }
         }
         //left edge
         x = startX;
         for(y = startY;y < startY+sectorHeight;y++){
-            data[x][y] = math.drawFractal(x, y);
+            math.setColor(x,y,math.drawFractal(x, y));
             
-            if(data[x][y] != control){
+            if(math.getColor(x,y) != control){
                 lineDetected = true;
             }
         }
         //right edge
         x = startX+sectorWidth-1;
         for(y = startY;y < startY+sectorHeight;y++){
-            data[x][y] = math.drawFractal(x, y);
+            math.setColor(x,y,math.drawFractal(x, y));
             
-            if(data[x][y] != control){
+            if(math.getColor(x,y) != control){
                 lineDetected = true;
             }
         }
@@ -133,7 +134,7 @@ public class FractalEdgeTrace {
             }
         } else {
             if(math.filter == 0 || math.filter == 2){
-                fullRenderRectangle(startX,startY,sectorWidth,sectorHeight,control);
+                fullRenderRectangle(startX,startY,sectorWidth,sectorHeight,controlIteration);
             } else if (math.filter == 1) {
                 fullRenderRectangle(startX,startY,sectorWidth,sectorHeight,0);
             }
@@ -153,7 +154,7 @@ public class FractalEdgeTrace {
         for(int x = startX; x < startX + sectorWidth; x++){
             for(int y = startY; y < startY + sectorHeight; y++){
                 if (x != startX && x != startX + sectorWidth - 1 && y != startY && y != startY + sectorHeight - 1) {
-                    data[x][y] = math.drawFractal(x, y);
+                    math.setColor(x,y,math.drawFractal(x, y));
                 }
             }
         }
@@ -173,7 +174,7 @@ public class FractalEdgeTrace {
         for(int x = startX; x < startX + sectorWidth; x++){
             for(int y = startY; y < startY + sectorHeight; y++){
                 if (x != startX && x != startX + sectorWidth - 1 && y != startY && y != startY + sectorHeight - 1) {
-                    data[x][y] = control;
+                    math.setColor(x,y,control);
                 }
             }
         }
@@ -200,8 +201,8 @@ public class FractalEdgeTrace {
     
                 if (pixelX >= 0 && pixelX < math.width &&
                     pixelY >= 0 && pixelY < math.height) {
-                    sumX += data[pixelX][pixelY] * gx[j + 1][i + 1];
-                    sumY += data[pixelX][pixelY] * gy[j + 1][i + 1];
+                    sumX += data[pixelY * math.width + pixelX] * gx[j + 1][i + 1];
+                    sumY += data[pixelY * math.width + pixelX] * gy[j + 1][i + 1];
                 }
             }
         }

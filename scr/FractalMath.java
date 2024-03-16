@@ -19,7 +19,7 @@ public class FractalMath {
 
     
     //data used by the program
-    public int[][] data;
+    public int[] data;
     private List<Color> colors;
 
     // where on the fractal to view
@@ -55,7 +55,7 @@ public class FractalMath {
         this.maxIter = maxIter;
         this.width = width;
         this.height = height;
-        this.data = new int[width][height];
+        this.data = new int[width*height];
         this.tracer = new FractalEdgeTrace(this, data);
         colors = generateColorPattern(50);
 
@@ -94,7 +94,11 @@ public class FractalMath {
      * @see this{@link #generateColorPattern(int)}
      * @see this{@link #data}
      */
-    public int getColor(int x, int y, int iterations) {
+    public int getColor(int x, int y) {
+        return data[y * width + x];
+    }
+
+    public void setColor(int x,int y,int iterations){
         int color = 0;
         if (iterations == maxIter ) {
             color = Color.BLACK.getRGB(); // color pixel black
@@ -103,9 +107,10 @@ public class FractalMath {
         }else {
             color = colors.get(iterations%colors.size()).getRGB(); // color pixel based on a gradient
         }
-        return color;
-        //frame.canvas.setRGB(x, y, color);
+        
+        data[y * width + x] = color;
     }
+
 
     /**
      * loops through the data and sets all the pixels 
@@ -116,39 +121,28 @@ public class FractalMath {
      * @see this{@link #data}
      */
     public void colorData(){
-        int[] colorArr = new int[width * height];
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int pixelIndex = y * width + x;
-                int color = 0;
-                if(filter == 0 || filter == 1) {
-                    color = getColor(x, y, data[x][y]);
-                } else {
+        if(filter == 2){
+            int[] filterArr = new int[width * height];
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int pixelIndex = y * width + x;
                     int edgeStrength = tracer.computeEdgeStrength(x, y);
-                    int edge = edgeStrength != 0 ? 255 : 0;
-                    color = getColor(x, y, edge);
-                } 
-                colorArr[pixelIndex] = color;
+                    if(edgeStrength != 0){
+                        edgeStrength = Color.GRAY.getRGB();
+                    } else {
+                        edgeStrength = 0;
+                    }
+                    filterArr[pixelIndex] = edgeStrength;
+                }
             }
+            frame.canvas.setRGB(0, 0, width, height, filterArr, 0, width);
+        } else {
+            frame.canvas.setRGB(0, 0, width, height, data, 0, width);
         }
-        frame.canvas.setRGB(0, 0, width, height, colorArr, 0, width);
-        
-        /* 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                if(filter == 0 || filter == 1) {
-                    setColor(x, y, data[x][y]);
-                } else {
-                    int edgeStrength = tracer.computeEdgeStrength(x, y);
-                    int edge = edgeStrength != 0 ? 255 : 0;
-                    setColor(x, y, edge);
-                } 
-                
-            }
-        }*/
         frame.fractalListener.loadingZoom = false;
     }
+
 
     /**
      * @param numColors number of colors in the list more colors the smoother gradient
