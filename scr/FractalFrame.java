@@ -31,7 +31,7 @@ public class FractalFrame extends JFrame {
     public int canvasWidth;
     public int canvasHeight;
 
-    public double scale = 1;
+    public double scale = 2;
 
     public FractalFrame(int maxIterations) {
         super("Fractal Explorer");
@@ -199,7 +199,7 @@ public class FractalFrame extends JFrame {
     
     
     public static void main(String[] args) {
-        FractalFrame frame = new FractalFrame(1000);
+        FractalFrame frame = new FractalFrame(100);
         // frame.setVisible(false);
         // frame.calculateAverageTime(100);
         // frame.dispose();
