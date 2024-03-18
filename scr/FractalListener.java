@@ -1,6 +1,5 @@
 package scr;
 
-import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -93,6 +92,16 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
 
         if(e.getKeyCode() == KeyEvent.VK_R){
             frame.resetFractal();
+        }
+
+        if(e.getKeyCode() == KeyEvent.VK_UP){
+            frame.fractalMath.maxIter++;
+            frame.calculateFractal();
+        }
+
+        if(e.getKeyCode() == KeyEvent.VK_DOWN){
+            frame.fractalMath.maxIter--;
+            frame.calculateFractal();
         }
 
     }

@@ -23,9 +23,9 @@ public class FractalMath {
     private List<Color> colors;
 
     // where on the fractal to view
-    public double centerReal = -0.5f;
+    public double centerReal = -.5;
     public double centerImag = 0;
-    public double zoom = 1.0f;
+    public double zoom = 1;
 
     private double minReal;
     private double maxReal;
@@ -41,7 +41,7 @@ public class FractalMath {
      * Filter 1: Normal But without filling in the empty quadrants
      * Filter 2: Edge Dectection Mode
      */
-    public int filter = 1;
+    public int filter = 0;
 
 
     /**
@@ -58,12 +58,7 @@ public class FractalMath {
         this.data = new int[width*height];
         this.tracer = new FractalEdgeTrace(this, data);
         colors = generateColorPattern(50);
-
-        minReal = centerReal - 2.5f / zoom;
-        maxReal = centerReal + 2.5f / zoom;
-        minImag = centerImag - 2.0f / zoom;
-        maxImag = centerImag + 2.0f / zoom;
-
+        recalculateBorders();
         seedReal = 0;
         seedImag = 0;
     }
@@ -74,24 +69,53 @@ public class FractalMath {
      * @see FractalListener#keyPressed(java.awt.event.KeyEvent)
      */
     public void resetFractal(){
+        maxIter = 100;
         seedReal = 0;
         seedImag = 0;
         centerReal = -0.5f;
         centerImag = 0;
         zoom = 1.0f;
+        recalculateBorders();
+        filter = 0;
+    }
+
+    /**
+     * updates the offset to act as if your 
+     * dragging the fractal around your screen
+     * @param dx change in x
+     * @param dy change in y
+     * @see FractalFrame#updateOffset(int, int)
+     */
+    public void updateOffset(int dx, int dy) {
+        double realIncrement = (2.5f / zoom) / width;
+        double imagIncrement = (2.0f / zoom) / height;
+        centerReal -= dx * realIncrement;
+        centerImag -= dy * imagIncrement;
+        recalculateBorders();
+    }
+
+
+    /**
+     * updates how far to zoom into the fractal
+     * @param zoomFactor
+     * @see FractalFrame#updateZoomLevel(double)
+     */
+    public void updateZoomLevel(double zoomFactor) {
+        zoom *= zoomFactor;
+        recalculateBorders();
+    }
+
+    public void recalculateBorders(){
+        //recalculates the position of the fractal
         minReal = centerReal - 2.5f / zoom;
         maxReal = centerReal + 2.5f / zoom;
         minImag = centerImag - 2.0f / zoom;
         maxImag = centerImag + 2.0f / zoom;
-        filter = 0;
     }
 
     
     public int getColor(int x, int y) {
         return data[y * width + x];
-    }
-    public int getColor(int pixelIndex) {
-        return data[pixelIndex];
     }
 
     /**
@@ -113,19 +137,6 @@ public class FractalMath {
         }
         
         data[y * width + x] = color;
-    }
-
-    public void setColor(int pixelIndex,int iterations){
-        int color = 0;
-        if (iterations == maxIter ) {
-            color = Color.BLACK.getRGB(); // color pixel black
-        } else if (iterations == 0){
-            color = Color.WHITE.getRGB(); // color pixel white
-        }else {
-            color = colors.get(iterations%colors.size()).getRGB(); // color pixel based on a gradient
-        }
-        
-        data[pixelIndex] = color;
     }
 
 
@@ -389,39 +400,5 @@ public class FractalMath {
      */
     public void edgeDetectionFractal() {
         tracer.calculateEdgeFractal(8);
-    }
-
-    /**
-     * updates the offset to act as if your 
-     * dragging the fractal around your screen
-     * @param dx change in x
-     * @param dy change in y
-     * @see FractalFrame#updateOffset(int, int)
-     */
-    public void updateOffset(int dx, int dy) {
-        double realIncrement = (2.5f / zoom) / width;
-        double imagIncrement = (2.0f / zoom) / height;
-        centerReal -= dx * realIncrement;
-        centerImag -= dy * imagIncrement;
-        recalculateBorders();
-    }
-
-
-    /**
-     * updates how far to zoom into the fractal
-     * @param zoomFactor
-     * @see FractalFrame#updateZoomLevel(double)
-     */
-    public void updateZoomLevel(double zoomFactor) {
-        zoom *= zoomFactor;
-        recalculateBorders();
-    }
-
-    public void recalculateBorders(){
-        //recalculates the position of the fractal
-        minReal = centerReal - 2.5f / zoom;
-        maxReal = centerReal + 2.5f / zoom;
-        minImag = centerImag - 2.0f / zoom;
-        maxImag = centerImag + 2.0f / zoom;
     }
 }

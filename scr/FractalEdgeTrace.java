@@ -37,7 +37,7 @@ public class FractalEdgeTrace {
             final int startX = i / sectorNum * sectorWidth;
             final int startY = i % sectorNum * sectorHeight;
             //assigns workload to the threads
-            executor.execute(() -> renderRectangle(startX, startY, sectorWidth, sectorHeight,0));
+            executor.execute(() -> renderRectangle(startX, startY, sectorWidth, sectorHeight));
             //renderRectangle(startX, startY, sectorWidth, sectorHeight);
         }
 
@@ -70,12 +70,11 @@ public class FractalEdgeTrace {
      *    guaranteed to be one color because all 
      *    the edges of the rectangle had been a single color
      */
-    public void renderRectangle(int startX, int startY, int sectorWidth, int sectorHeight, int sector){
+    public void renderRectangle(int startX, int startY, int sectorWidth, int sectorHeight){
         boolean lineDetected = false;
         int controlIteration = math.drawFractal(startX, startY);
         math.setColor(startX,startY,controlIteration);
         int control = math.getColor(startX, startY);
-        int pixelIndex = startY*math.width+startX;
         int x = 0;
         int y = 0;
         //top edge
@@ -128,10 +127,10 @@ public class FractalEdgeTrace {
         if(lineDetected){
             //if quadrant is too small then just render all the pixels
             if(sectorHeight > 3){
-                renderRectangle((startX)+1,                 (startY+1),                 (sectorWidth/2),    (sectorHeight/2)  ,1);
-                renderRectangle((startX+sectorWidth/2)+1,   (startY)+1,                 (sectorWidth/2)-1,  (sectorHeight/2)-1,2);
-                renderRectangle((startX)+1,                 (startY+sectorHeight/2)+1,  (sectorWidth/2)-1,  (sectorHeight/2)-1,3);
-                renderRectangle((startX+sectorWidth/2),     (startY+sectorHeight/2),    (sectorWidth/2),    (sectorHeight/2)  ,4);
+                renderRectangle((startX)+1,                 (startY)+1,                 (sectorWidth/2)-1,    (sectorHeight/2)-1);
+                renderRectangle((startX+sectorWidth/2),   (startY)+1,                 (sectorWidth/2),  (sectorHeight/2)-1);
+                renderRectangle((startX)+1,                 (startY+sectorHeight/2),  (sectorWidth/2)-1,  (sectorHeight/2));
+                renderRectangle((startX+sectorWidth/2),     (startY+sectorHeight/2),    (sectorWidth/2),    (sectorHeight/2));
             } else {
                 fullRenderRectangle(startX,startY,sectorWidth,sectorHeight);
             }
@@ -191,12 +190,7 @@ public class FractalEdgeTrace {
      * @see FractalMath#colorData()
      */
     public int computeEdgeStrength(int x, int y) {
-        int[][] gx = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
-        int[][] gy = {{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}};
-    
-        int sumX = 0;
-        int sumY = 0;
-    
+        int color = math.getColor(x, y);   
         for (int j = -1; j <= 1; j++) {
             for (int i = -1; i <= 1; i++) {
                 int pixelX = x + i;
@@ -204,13 +198,14 @@ public class FractalEdgeTrace {
     
                 if (pixelX >= 0 && pixelX < math.width &&
                     pixelY >= 0 && pixelY < math.height) {
-                    sumX += data[pixelY * math.width + pixelX] * gx[j + 1][i + 1];
-                    sumY += data[pixelY * math.width + pixelX] * gy[j + 1][i + 1];
+                        if(color != data[pixelY * math.width + pixelX]){
+                            return 1;
+                        }
                 }
             }
         }
     
-        return (int) Math.sqrt(sumX * sumX + sumY * sumY);
+        return 0;
     }
     
     

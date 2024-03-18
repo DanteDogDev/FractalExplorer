@@ -24,12 +24,14 @@ public class FractalFrame extends JFrame {
 
     public FractalListener fractalListener;
     public FractalMath fractalMath;
+
     public BufferedImage canvas;
-    public int canvasWidth;
-    public int canvasHeight;
     private BufferStrategy bufferStrategy;
 
-    public double scale = 2;
+    public int canvasWidth;
+    public int canvasHeight;
+
+    public double scale = 1;
 
     public FractalFrame(int maxIterations) {
         super("Fractal Explorer");
@@ -72,8 +74,6 @@ public class FractalFrame extends JFrame {
      * to be as large as your screen
      */
     public void setupCanvas() {
-        // gets size of screen
-
         // sets up the canvas
         canvas = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_ARGB);
         
@@ -145,7 +145,6 @@ public class FractalFrame extends JFrame {
         long totalDuration = 0;
 
         for (int i = 0; i < iterations; i++) {
-            //System.out.print("*");
             long startTime = System.nanoTime();
             fractalMath.edgeDetectionFractal();
             fractalMath.colorData();
@@ -181,18 +180,19 @@ public class FractalFrame extends JFrame {
             return;
         }
         Graphics g = canvas.getGraphics();
-        g.setColor(Color.GRAY); // You can change the color if needed
+        g.setColor(Color.GRAY);
         g.drawLine(p1.x, p1.y, p2.x, p2.y); 
-        g.dispose(); // Dispose the Graphics object to free resources
+        g.dispose();
     }
+
     public void drawDot(Point p,Color color) {
         if(p == null){
             return;
         }
         Graphics g = canvas.getGraphics();
-        g.setColor(color); // You can change the color if needed
+        g.setColor(color);
         g.drawOval(p.x, p.y, 2, 2); 
-        g.dispose(); // Dispose the Graphics object to free resources
+        g.dispose();
     }
 
 
