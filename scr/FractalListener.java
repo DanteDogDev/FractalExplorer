@@ -20,6 +20,10 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
     public FractalListener(FractalFrame frame) {
         this.frame = frame;
         loadingZoom = false;
+        frame.addKeyListener(this);
+        frame.addMouseListener(this);
+        frame.addMouseMotionListener(this);
+        frame.addMouseWheelListener(this);
     }
 
     @Override

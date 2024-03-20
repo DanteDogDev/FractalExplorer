@@ -11,9 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FractalMath {
+    //frame of the canvas so that the 
+    //class can bring back data to the frame
     public FractalFrame frame;
+    //fractal calculation algorithim
     private FractalEdgeTrace tracer;
+    //max amount of iterations per pixel
     public int maxIter;
+    // width/height of the canvas
     public int width;
     public int height;
 
@@ -27,6 +32,7 @@ public class FractalMath {
     public double centerImag = 0;
     public double zoom = 1;
 
+    //where the borders are on the fractal to be generated
     private double minReal;
     private double maxReal;
     private double minImag;

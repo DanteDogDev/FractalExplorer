@@ -12,6 +12,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+
 //misc
 import java.awt.Toolkit;
 
@@ -21,47 +22,41 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 
 public class FractalFrame extends JFrame {
-
+    //fractal math required to generate the fractal 
     public FractalListener fractalListener;
+
+    //listeners so that i can check for keyboard/mouse inputs
     public FractalMath fractalMath;
 
+    //The image the fractal is stored in
     public BufferedImage canvas;
     private BufferStrategy bufferStrategy;
 
+    //how many times smaller will the acutual resoulution of the picture be compared to the screen resolution
+    public double scale;
+
+    //dimensions of the screen
     public int canvasWidth;
     public int canvasHeight;
 
-    public double scale = 2;
-
-    public FractalFrame(int maxIterations) {
+    /**
+     * @param maxIterations the maxiumum amount of iterations
+     */
+    public FractalFrame(int maxIterations, double scale) {
         super("Fractal Explorer");
+        this.scale = scale;
         // sets icon of the window
         Image icon = new javax.swing.ImageIcon("assets/icon.png").getImage();
         setIconImage(icon);
-    
+
         // Add Mouse/Key Listener
         fractalListener = new FractalListener(this);
-        addKeyListener(fractalListener);
-        addMouseListener(fractalListener);
-        addMouseMotionListener(fractalListener);
-        addMouseWheelListener(fractalListener);
-    
+
         // creates window
-        Toolkit toolKit = Toolkit.getDefaultToolkit();
-        Dimension screenSize = toolKit.getScreenSize();
         setupFrame();
-    
-        // sets up the canvas
-        canvasWidth = (int)(screenSize.width/scale);
-        canvasHeight = (int)(screenSize.height/scale);
+
+        //sets up the buffered image
         setupCanvas();
-        
-        // Make the frame visible
-        setVisible(true);
-    
-        // Enable double bufferinga
-        createBufferStrategy(2);
-        bufferStrategy = getBufferStrategy();
 
         // calculating fractals
         fractalMath = new FractalMath(this, maxIterations, canvasWidth, canvasHeight);
@@ -70,17 +65,20 @@ public class FractalFrame extends JFrame {
     
 
     /**
-     * Sets up the buffered image
-     * to be as large as your screen
+     * sets up the buffered image into the frame so that it has double buffering enable
+     * and starts out white
      */
     public void setupCanvas() {
-        // sets up the canvas
+        // sets up the image
         canvas = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_ARGB);
-        
+        //sets up default image
         Graphics2D g2d = canvas.createGraphics();
         g2d.setColor(Color.WHITE);
         g2d.fillRect(0, 0, canvasWidth, canvasHeight);
         g2d.dispose();
+        //sets up double buffering
+        createBufferStrategy(2);
+        bufferStrategy = getBufferStrategy();
 
     }
 
@@ -88,15 +86,23 @@ public class FractalFrame extends JFrame {
      * Sets up the frame to be
      * Fullscreen, not resizeable, 
      * and without the top bar's
+     * and generates the screen dimensions
      */
     private void setupFrame() {
+        Toolkit toolKit = Toolkit.getDefaultToolkit();
+        Dimension screenSize = toolKit.getScreenSize();
+        canvasWidth = (int)(screenSize.width/scale);
+        canvasHeight = (int)(screenSize.height/scale);
         setSize(canvasWidth, canvasHeight);
         setUndecorated(true);
         setResizable(false);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setVisible(true);
     }
-
-    @Override
+    /**
+     * @Override the JFrame paint method 
+     * in order to get the buffered image to show up on the frame
+     */
     public void paint(Graphics g) {
         Graphics2D g2D = (Graphics2D) bufferStrategy.getDrawGraphics();
         try {
@@ -124,7 +130,7 @@ public class FractalFrame extends JFrame {
 
     /**
      * updates the zoom on the fractal
-     * @param zoomFactor how much to multiply the zoom by
+     * @param zoomFactor how much to change the zoom by
      * @see FractalListener#mouseWheelMoved(java.awt.event.MouseWheelEvent)
      */
     public void updateZoomLevel(double zoomFactor) {
@@ -133,7 +139,9 @@ public class FractalFrame extends JFrame {
     }
 
     /**
-     * calculates the data for the canvas then paints the canvas
+     * calculates the data for the 
+     * canvas then paints the canvas
+     * to display the fractal in its current position
      */
     public void calculateFractal() {
         fractalMath.edgeDetectionFractal();
@@ -141,40 +149,70 @@ public class FractalFrame extends JFrame {
         repaint();
     }
 
+    /**
+     * calcualtes the average time to generate the mandelbrot set inital image
+     * and averages out the time and displays it
+     * @param iterations the number of times the image is calculated
+     */
     public void calculateAverageTime(int iterations) {
-        long totalDuration = 0;
-
+        //makes the frame not appear
+        setVisible(false);
+        long totalTime = 0;
+        //for every iteration
         for (int i = 0; i < iterations; i++) {
             long startTime = System.nanoTime();
             fractalMath.edgeDetectionFractal();
             fractalMath.colorData();
             repaint();
             long endTime = System.nanoTime();
-            long duration = (endTime - startTime) / 1000000;
-            totalDuration += duration;
+            //add the total time to the sum
+            totalTime += ((endTime - startTime) / 1000000);//add the amount in millisecounds to the total time
         }
-        double averageDuration = totalDuration / ((double)iterations);
-        System.out.println("Average Time for "+iterations+" iterations of "+fractalMath.maxIter+" precision: " + averageDuration + " milliseconds");
+        //divide the sum by the number of iterations
+        double averageDuration = totalTime / ((double)iterations);
+        System.out.println("Average Time for "+iterations+" iterations of "+fractalMath.maxIter+" precision for: " + averageDuration + " milliseconds");
+        //close the program when done
+        dispose();
 
     }
 
+    /**
+     * generates the line that forms on that 
+     * spot on the fractal and draws the path for it
+     * @param x px on the screen
+     * @param y px on the screen
+     */
     public void calculateFractalPath(int x, int y){
         fractalMath.colorData();
         fractalMath.drawFractalPath(x,y);
         repaint();
     }
 
+
+    /**
+     * generates a new fractal based on a cordinate from the mandelbrot set translated into the julia set
+     * @param x px on the screen
+     * @param y px on the screen
+     */
     public void setFractalSeed(int x, int y){
         fractalMath.seedReal = fractalMath.xToReal(x);
         fractalMath.seedImag = fractalMath.yToImag(y);
         calculateFractal();
     }
 
+    /**
+     * resets the fractal to be in default position
+     */
     public void resetFractal(){
         fractalMath.resetFractal();
         calculateFractal();
     }
 
+    /**
+     * draws a line from point A to point B on the image
+     * @param p1 point A
+     * @param p2 point B
+     */
     public void drawLine(Point p1, Point p2) {
         if(p2 == null || p1 == null){
             return;
@@ -185,6 +223,11 @@ public class FractalFrame extends JFrame {
         g.dispose();
     }
 
+    /**
+     * draws a small circle on the screen at point A
+     * @param p point A
+     * @param color color of the point
+     */
     public void drawDot(Point p,Color color) {
         if(p == null){
             return;
@@ -193,19 +236,5 @@ public class FractalFrame extends JFrame {
         g.setColor(color);
         g.drawOval(p.x, p.y, 2, 2); 
         g.dispose();
-    }
-
-
-    
-    
-    public static void main(String[] args) {
-        FractalFrame frame = new FractalFrame(100);
-        // frame.setVisible(false);
-        // frame.calculateAverageTime(100);
-        // frame.dispose();
-    }
-
-    
-
-    
+    }    
 }
