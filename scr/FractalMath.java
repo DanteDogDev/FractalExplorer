@@ -63,7 +63,7 @@ public class FractalMath {
         this.height = height;
         this.data = new int[width*height];
         this.tracer = new FractalEdgeTrace(this, data);
-        colors = generateColorPattern(50);
+        colors = generateColorPattern(100);
         recalculateBorders();
         seedReal = 0;
         seedImag = 0;
