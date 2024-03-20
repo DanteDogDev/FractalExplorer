@@ -117,8 +117,10 @@ public class FractalEdgeTrace {
         }
         
         // Uncomment to see the fractal generate in real time (Dont try to zoom or drag the fractal)
-        // math.colorData();
-        // math.frame.repaint();
+        if(math.frame.animate){
+            math.colorData();
+            math.frame.repaint();
+        }
 
         //if line is detected in quadrant split up the quadrant and look for the line
         //else

@@ -90,8 +90,7 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
         }
 
         if(e.getKeyCode() == KeyEvent.VK_SPACE){
-            frame.fractalMath.filter = (++frame.fractalMath.filter) % 3;
-            frame.calculateFractal();
+            frame.setFilter((frame.fractalMath.filter+1) % 3);
         }
 
         if(e.getKeyCode() == KeyEvent.VK_R){
@@ -99,13 +98,11 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
         }
 
         if(e.getKeyCode() == KeyEvent.VK_UP){
-            frame.fractalMath.maxIter++;
-            frame.calculateFractal();
+            frame.updateMaxIter(1);
         }
 
         if(e.getKeyCode() == KeyEvent.VK_DOWN){
-            frame.fractalMath.maxIter--;
-            frame.calculateFractal();
+            frame.updateMaxIter(-1);
         }
 
     }

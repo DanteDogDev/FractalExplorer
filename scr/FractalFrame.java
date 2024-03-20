@@ -28,6 +28,10 @@ public class FractalFrame extends JFrame {
     //listeners so that i can check for keyboard/mouse inputs
     public FractalMath fractalMath;
 
+    //When animating disable all possible player input aside from esc to leave program and update the 
+    //canvas during the generation in order to visualize how the program generates the fractal
+    public boolean animate;
+
     //The image the fractal is stored in
     public BufferedImage canvas;
     private BufferStrategy bufferStrategy;
@@ -42,9 +46,10 @@ public class FractalFrame extends JFrame {
     /**
      * @param maxIterations the maxiumum amount of iterations
      */
-    public FractalFrame(int maxIterations, double scale) {
+    public FractalFrame(int maxIterations, double scale, boolean animate) {
         super("Fractal Explorer");
         this.scale = scale;
+        this.animate = animate;
         // sets icon of the window
         Image icon = new javax.swing.ImageIcon("assets/icon.png").getImage();
         setIconImage(icon);
@@ -60,7 +65,11 @@ public class FractalFrame extends JFrame {
 
         // calculating fractals
         fractalMath = new FractalMath(this, maxIterations, canvasWidth, canvasHeight);
-        calculateFractal();
+        //instead of just calling the calculate fractal method i just call these so that i can animate the process 
+        //and not let the user to interact with the program after that to prevent bugs
+        fractalMath.edgeDetectionFractal();
+        fractalMath.colorData();
+        repaint();
     }
     
 
@@ -104,17 +113,28 @@ public class FractalFrame extends JFrame {
      * in order to get the buffered image to show up on the frame
      */
     public void paint(Graphics g) {
-        Graphics2D g2D = (Graphics2D) bufferStrategy.getDrawGraphics();
+        Graphics2D g2D = null;
         try {
+            g2D = (Graphics2D) bufferStrategy.getDrawGraphics();
             g2D.scale(scale, scale);
             super.paint(g2D);
             g2D.drawImage(canvas, 0, 0, this);
-        } finally {
+        } catch (Exception e) {
             g2D.dispose();
         }
         bufferStrategy.show();
     }
-    
+
+    /**
+     * updates the maximum iteration of the fractal
+     * @param d how much to change it by
+     */
+    public void updateMaxIter(int d){
+        if(animate == false){
+            fractalMath.maxIter += d;
+            calculateFractal();
+        }
+    }
    
     /**
      * updates the offset based on the change in x and change in y
@@ -123,8 +143,11 @@ public class FractalFrame extends JFrame {
      * @see FractalListener#mouseDragged(java.awt.event.MouseEvent)
      */
     public void updateOffset(int dx, int dy) {
-        fractalMath.updateOffset(dx, dy);
-        calculateFractal();
+        if(animate == false){
+            fractalMath.updateOffset(dx, dy);
+            calculateFractal();
+        }
+        
 
     }
 
@@ -134,8 +157,32 @@ public class FractalFrame extends JFrame {
      * @see FractalListener#mouseWheelMoved(java.awt.event.MouseWheelEvent)
      */
     public void updateZoomLevel(double zoomFactor) {
-        fractalMath.updateZoomLevel(zoomFactor);
-        calculateFractal();
+        if(animate == false){
+            fractalMath.updateZoomLevel(zoomFactor);
+            calculateFractal();
+        }
+        
+    }
+
+    /**
+    * generates a new fractal based on a cordinate from the mandelbrot set translated into the julia set
+    * @param x px on the screen
+    * @param y px on the screen
+    */
+    public void setFractalSeed(int x, int y){
+        if(animate == false){
+            fractalMath.seedReal = fractalMath.xToReal(x);
+            fractalMath.seedImag = fractalMath.yToImag(y);
+            calculateFractal();
+        }
+        
+    }
+
+    public void setFilter(int filter) {
+        if(animate == false){
+            fractalMath.filter = filter;
+            calculateFractal();
+        }
     }
 
     /**
@@ -144,9 +191,36 @@ public class FractalFrame extends JFrame {
      * to display the fractal in its current position
      */
     public void calculateFractal() {
-        fractalMath.edgeDetectionFractal();
-        fractalMath.colorData();
-        repaint();
+        if(animate == false){
+            fractalMath.edgeDetectionFractal();
+            fractalMath.colorData();
+            repaint();
+        }
+    }
+
+    /**
+     * resets the fractal to be in default position
+     */
+    public void resetFractal(){
+        if(animate == false){
+            fractalMath.resetFractal();
+            calculateFractal();
+        }
+        
+    }
+
+    /**
+     * generates the line that forms on that 
+     * spot on the fractal and draws the path for it
+     * @param x px on the screen
+     * @param y px on the screen
+     */
+    public void calculateFractalPath(int x, int y){
+        if(animate == false){
+            fractalMath.colorData();
+            fractalMath.drawFractalPath(x,y);
+            repaint();
+        }
     }
 
     /**
@@ -174,38 +248,6 @@ public class FractalFrame extends JFrame {
         //close the program when done
         dispose();
 
-    }
-
-    /**
-     * generates the line that forms on that 
-     * spot on the fractal and draws the path for it
-     * @param x px on the screen
-     * @param y px on the screen
-     */
-    public void calculateFractalPath(int x, int y){
-        fractalMath.colorData();
-        fractalMath.drawFractalPath(x,y);
-        repaint();
-    }
-
-
-    /**
-     * generates a new fractal based on a cordinate from the mandelbrot set translated into the julia set
-     * @param x px on the screen
-     * @param y px on the screen
-     */
-    public void setFractalSeed(int x, int y){
-        fractalMath.seedReal = fractalMath.xToReal(x);
-        fractalMath.seedImag = fractalMath.yToImag(y);
-        calculateFractal();
-    }
-
-    /**
-     * resets the fractal to be in default position
-     */
-    public void resetFractal(){
-        fractalMath.resetFractal();
-        calculateFractal();
     }
 
     /**
