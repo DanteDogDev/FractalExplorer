@@ -24,7 +24,7 @@ public class FractalMath {
 
     
     //data used by the program
-    public int[] data;
+    private int[] data;
     private List<Color> colors;
 
     // where on the fractal to view
@@ -124,6 +124,27 @@ public class FractalMath {
         return data[y * width + x];
     }
 
+     /**
+     * @param numColors number of colors in the list more colors the smoother gradient
+     * @return a list of colors based on the HSB color list
+     */
+    public static List<Color> generateColorPattern(int numColors) {
+        List<Color> colors = new ArrayList<>();
+
+        for (int i = 0; i < numColors; i++) {
+            double hue = (double) i / numColors; 
+            double saturation = 1; 
+            double brightness = 1;
+            
+            // create a color using the HSB set
+            Color color = Color.getHSBColor((float)hue, (float)saturation, (float)brightness);
+            //add the color
+            colors.add(color);
+        }
+
+        return colors;
+    }
+
     /**
      * colors a pixel on the buffered image canvas depending on the 
      * number of iteration it took for the calculation to complete
@@ -177,28 +198,6 @@ public class FractalMath {
         frame.fractalListener.loadingZoom = false;
     }
 
-
-    /**
-     * @param numColors number of colors in the list more colors the smoother gradient
-     * @return a list of colors based on the HSB color list
-     */
-    public static List<Color> generateColorPattern(int numColors) {
-        List<Color> colors = new ArrayList<>();
-
-        for (int i = 0; i < numColors; i++) {
-            double hue = (double) i / numColors; 
-            double saturation = 1; 
-            double brightness = 1;
-            
-            // create a color using the HSB set
-            Color color = Color.getHSBColor((float)hue, (float)saturation, (float)brightness);
-            //add the color
-            colors.add(color);
-        }
-
-        return colors;
-    }
-
     /**
      * chooses which fractal to use to draw the fractal
      * @param cords to start the path
@@ -206,11 +205,14 @@ public class FractalMath {
      * @see this{@link #juliaSet(int, int)}
      */
     public int drawFractal(int x, int y){
+        int iter = 0;
         if(seedImag == 0 && seedReal == 0){
-            return mandelbrotSet(x, y);
+            iter = mandelbrotSet(x, y);
         } else {
-            return juliaSet(x,y);
+            iter = juliaSet(x,y);
         }
+        setColor(x, y, iter);
+        return iter;
     }
 
     

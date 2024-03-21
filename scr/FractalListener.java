@@ -13,7 +13,7 @@ import javax.swing.SwingUtilities;
 
 public class FractalListener implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener{
 
-    FractalFrame frame;
+    private FractalFrame frame;
     private Point onDrag;
     public boolean loadingZoom;
 

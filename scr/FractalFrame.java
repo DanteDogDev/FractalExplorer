@@ -24,7 +24,7 @@ import java.awt.image.BufferedImage;
 public class FractalFrame extends JFrame {
     //fractal math required to generate the fractal 
     public FractalListener fractalListener;
-
+    
     //listeners so that i can check for keyboard/mouse inputs
     public FractalMath fractalMath;
 
@@ -67,6 +67,7 @@ public class FractalFrame extends JFrame {
         fractalMath = new FractalMath(this, maxIterations, canvasWidth, canvasHeight);
         //instead of just calling the calculate fractal method i just call these so that i can animate the process 
         //and not let the user to interact with the program after that to prevent bugs
+
         fractalMath.edgeDetectionFractal();
         fractalMath.colorData();
         repaint();

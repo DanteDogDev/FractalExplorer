@@ -68,19 +68,18 @@ public class FractalEdgeTrace {
      * @see this{@link #fullRenderRectangle(int, int, int, int, int)} 
      *    used to fill in a rectangle that is 
      *    guaranteed to be one color because all 
-     *    the edges of the rectangle had been a single color
+     *    the edges of the rectangle had been` a single color
      */
     public void renderRectangle(int startX, int startY, int sectorWidth, int sectorHeight){
         boolean lineDetected = false;
         int controlIteration = math.drawFractal(startX, startY);
-        math.setColor(startX,startY,controlIteration);
         int control = math.getColor(startX, startY);
         int x = 0;
         int y = 0;
         //top edge
         y = startY;
         for(x = startX+1;x < startX+sectorWidth;x++){
-            math.setColor(x,y,math.drawFractal(x, y));
+            math.drawFractal(x, y);
             
             if(math.getColor(x,y) != control){
                 lineDetected = true;
@@ -90,7 +89,7 @@ public class FractalEdgeTrace {
         //bottom edge
         y = startY+sectorHeight-1;
         for(x = startX;x < startX+sectorWidth;x++){
-           math.setColor(x,y,math.drawFractal(x, y));
+            math.drawFractal(x, y);
            
            if(math.getColor(x,y) != control){
                lineDetected = true;
@@ -100,7 +99,7 @@ public class FractalEdgeTrace {
         //left edge
         x = startX;
         for(y = startY;y < startY+sectorHeight;y++){
-            math.setColor(x,y,math.drawFractal(x, y));
+            math.drawFractal(x, y);
             
             if(math.getColor(x,y) != control){
                 lineDetected = true;
@@ -109,7 +108,7 @@ public class FractalEdgeTrace {
         //right edge
         x = startX+sectorWidth-1;
         for(y = startY;y < startY+sectorHeight;y++){
-            math.setColor(x,y,math.drawFractal(x, y));
+            math.drawFractal(x, y);
             
             if(math.getColor(x,y) != control){
                 lineDetected = true;
@@ -158,7 +157,7 @@ public class FractalEdgeTrace {
         for(int x = startX; x < startX + sectorWidth; x++){
             for(int y = startY; y < startY + sectorHeight; y++){
                 if (x != startX && x != startX + sectorWidth - 1 && y != startY && y != startY + sectorHeight - 1) {
-                    math.setColor(x,y,math.drawFractal(x, y));
+                    math.drawFractal(x, y);
                 }
             }
         }
