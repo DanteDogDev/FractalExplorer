@@ -13,13 +13,11 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 
-//misc
-import java.awt.Toolkit;
-
 //Windows frame library
 import javax.swing.JFrame;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.awt.Toolkit;
 
 public class FractalFrame extends JFrame {
     //fractal math required to generate the fractal 
@@ -114,15 +112,11 @@ public class FractalFrame extends JFrame {
      * in order to get the buffered image to show up on the frame
      */
     public void paint(Graphics g) {
-        Graphics2D g2D = null;
-        try {
-            g2D = (Graphics2D) bufferStrategy.getDrawGraphics();
-            g2D.scale(scale, scale);
-            super.paint(g2D);
-            g2D.drawImage(canvas, 0, 0, this);
-        } catch (Exception e) {
-            g2D.dispose();
-        }
+        Graphics2D g2D = (Graphics2D) bufferStrategy.getDrawGraphics();
+        g2D.scale(scale, scale);
+        super.paint(g2D);
+        g2D.drawImage(canvas, 0, 0, this);
+        g2D.dispose();
         bufferStrategy.show();
     }
 
