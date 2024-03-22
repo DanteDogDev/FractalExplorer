@@ -1,6 +1,5 @@
 /**
  * Name:Dante Harper
- * Date:2024 / 3 / 13
  * Desc: generates a frame with a buffered image that 
  * has a fractal where you could freely explore
  */

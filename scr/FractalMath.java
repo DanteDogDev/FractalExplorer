@@ -1,6 +1,5 @@
 /**
  * Name:Dante Harper
- * Date:2024 / 3 / 13
  * Desc: calculates the math required to render a fractal on the screen
  */
 package scr;
