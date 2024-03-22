@@ -127,10 +127,10 @@ public class FractalListener implements KeyListener, MouseListener, MouseMotionL
         int notches = arg0.getWheelRotation();
         if(notches < 0){
             loadingZoom = true;
-            frame.updateZoomLevel(0.9);
+            frame.updateZoomLevel(0.8);
         } else {
             loadingZoom = true;
-            frame.updateZoomLevel(1.1);
+            frame.updateZoomLevel(1.2);
         }
     }
     
