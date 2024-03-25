@@ -1,5 +1,4 @@
 /**
- * Name:Dante Harper
  * Desc: calculates the math required to render a fractal on the screen
  */
 package scr;
@@ -132,11 +131,9 @@ public class FractalMath {
 
         for (int i = 0; i < numColors; i++) {
             double hue = (double) i / numColors; 
-            double saturation = 1; 
-            double brightness = 1;
             
             // create a color using the HSB set
-            Color color = Color.getHSBColor((float)hue, (float)saturation, (float)brightness);
+            Color color = Color.getHSBColor((float)hue, 1, 1);
             //add the color
             colors.add(color);
         }

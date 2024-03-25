@@ -1,5 +1,4 @@
 /**
- * Name:Dante Harper
  * Desc: listens for keyboard and mouse inputs and 
  * calls functions to the frame to correctly apply the input
  */

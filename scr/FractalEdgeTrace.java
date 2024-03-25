@@ -1,5 +1,4 @@
 /**
- * Name:Dante Harper
  * Desc: calculates the fractal by tracing 
  * the edges of the fractal and skipping a lot of the calculations
  * since when u find the edge of a fractal you just need to fill 
