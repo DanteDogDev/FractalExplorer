@@ -11,7 +11,7 @@ public class FractalMain {
         FractalFrame fractalExplorer = new FractalFrame(100, 2, false);
         //fractalExplorer.calculateAverageTime(100);
 
-        //controls
+        //controls:
         //hold left click to drag fractal around
         //mouse wheel to zoom in
         //right click to set seed for julia set fractal
