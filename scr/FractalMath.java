@@ -171,6 +171,7 @@ public class FractalMath {
      * @see FractalFrame#canvas
      * @see this{@link #data}
      */
+    
     public void colorData(){
 
         if(filter == 2){
@@ -218,6 +219,7 @@ public class FractalMath {
      * @see this{@link #drawMandelBrotSetPath(int, int)}
      * @see this{@link #drawJuliaSetPath(int, int)}
      */
+
     public void drawFractalPath(int x, int y){
         if(seedImag == 0 && seedReal == 0){
             drawMandelBrotSetPath(x, y);
@@ -280,6 +282,7 @@ public class FractalMath {
 
         return i;
     }
+    
 
 
     /**

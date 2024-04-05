@@ -62,6 +62,9 @@ public class FractalFrame extends JFrame {
 
         // calculating fractals
         fractalMath = new FractalMath(this, maxIterations, canvasWidth, canvasHeight);
+        if(animate){
+            fractalMath.filter = 1;
+        }
         //instead of just calling the calculate fractal method i just call these so that i can animate the process 
         //and not let the user to interact with the program after that to prevent bugs
 
