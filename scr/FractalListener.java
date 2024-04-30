@@ -2,7 +2,7 @@
  * Desc: listens for keyboard and mouse inputs and 
  * calls functions to the frame to correctly apply the input
  */
-package scr;
+package Java.FractalExplorer.scr;
 
 import java.awt.Point;
 import java.awt.event.KeyEvent;

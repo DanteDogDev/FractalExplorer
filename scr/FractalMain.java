@@ -1,4 +1,4 @@
-package scr;
+package Java.FractalExplorer.scr;
 
 public class FractalMain {
     @SuppressWarnings("unused")

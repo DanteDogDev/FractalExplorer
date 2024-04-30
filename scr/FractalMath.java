@@ -1,7 +1,7 @@
 /**
  * Desc: calculates the math required to render a fractal on the screen
  */
-package scr;
+package Java.FractalExplorer.scr;
 
 import java.awt.Color;
 import java.awt.Point;
