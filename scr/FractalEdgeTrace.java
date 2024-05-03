@@ -49,6 +49,8 @@ public class FractalEdgeTrace {
             e.printStackTrace();
         }
 
+        math.frame.animate = false;
+
     }
     
     /**
