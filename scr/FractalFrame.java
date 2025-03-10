@@ -3,7 +3,7 @@
  * Desc: generates a frame with a buffered image that 
  * has a fractal where you could freely explore
  */
-package Java.FractalExplorer.scr;
+package FractalExplorer.scr;
 //Graphics Library
 import java.awt.Color;
 import java.awt.Dimension;

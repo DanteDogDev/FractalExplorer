@@ -1,4 +1,4 @@
-package Java.FractalExplorer.scr;
+package FractalExplorer.scr;
 
 public class FractalMain {
     @SuppressWarnings("unused")
@@ -8,7 +8,7 @@ public class FractalMain {
         //animate: true/false 
         //if true it disables all functionality aside from escaping the program and slows
         //                  down the process of generating the image in order to watch it
-        FractalFrame fractalExplorer = new FractalFrame(100, 2, false);
+        FractalFrame fractalExplorer = new FractalFrame(100, 2, true);
         //fractalExplorer.calculateAverageTime(100);
 
         //controls:

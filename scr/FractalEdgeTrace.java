@@ -4,7 +4,7 @@
  * since when u find the edge of a fractal you just need to fill 
  * everything thats within that edge with whatever color represents it 
  */
-package Java.FractalExplorer.scr;
+package FractalExplorer.scr;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
